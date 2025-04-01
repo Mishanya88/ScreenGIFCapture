@@ -24,5 +24,10 @@ namespace ScreenGIFCapture
         {
             InitializeComponent();
         }
+
+        private void ScreenButtonClick(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
