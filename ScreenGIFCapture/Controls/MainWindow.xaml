@@ -77,7 +77,7 @@
                         Click="ScreenButtonClick">
                     <Button.Content>
                         <StackPanel>
-                            <Image Source="/capture.png" Width="40" />
+                            <Image Source="/Controls/WindowScreen.png" Width="40" />
                             <TextBlock Text="Screen" Margin="0 5 0 0"/>
                         </StackPanel>
                     </Button.Content>

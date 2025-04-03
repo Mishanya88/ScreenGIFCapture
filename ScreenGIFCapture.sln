@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178 d17.12
+VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScreenGIFCapture", "ScreenGIFCapture\ScreenGIFCapture.csproj", "{D962E2DD-1491-4873-9F57-3FE62C992038}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScreenGIFCapture", "ScreenGIFCapture\ScreenGIFCapture.csproj", "{DCF3B3E9-C1AB-40F4-A2CE-85A4B9C84E5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D962E2DD-1491-4873-9F57-3FE62C992038}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D962E2DD-1491-4873-9F57-3FE62C992038}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D962E2DD-1491-4873-9F57-3FE62C992038}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D962E2DD-1491-4873-9F57-3FE62C992038}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCF3B3E9-C1AB-40F4-A2CE-85A4B9C84E5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCF3B3E9-C1AB-40F4-A2CE-85A4B9C84E5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCF3B3E9-C1AB-40F4-A2CE-85A4B9C84E5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCF3B3E9-C1AB-40F4-A2CE-85A4B9C84E5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
