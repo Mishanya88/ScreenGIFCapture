@@ -1,16 +1,13 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-namespace ScreenGIFCapture
+﻿namespace ScreenGIFCapture
 {
+    using System;
+    using System.IO;
+    using System.Drawing.Imaging;
+    using System.Windows;
+    using ScreenGIFCapture.Base;
+    using ScreenGIFCapture.Images;
+    using ScreenGIFCapture.Screen;
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -23,7 +20,21 @@ namespace ScreenGIFCapture
 
         private void ScreenButtonClick(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            IScreen screen = ScreenWindow.GetScreen();
+
+            if (screen != null)
+            {
+                IBitmapImage img = ScreenShot.CaptureImage(screen.Rectangle);
+                SaveScreenShot(img);
+            }
+        }
+
+        private void SaveScreenShot(IBitmapImage img)
+        {
+            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+            string file = Path.Combine(desktop, $"{date}.png");
+            img.Save(file, ImageFormat.Png);
         }
     }
 }

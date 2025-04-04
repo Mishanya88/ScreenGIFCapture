@@ -9,6 +9,5 @@
         {
             ServicesPlatform = new WindowsServices();
         }
-
     }
 }

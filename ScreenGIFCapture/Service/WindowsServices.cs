@@ -1,18 +1,25 @@
-﻿namespace ScreenGIFCapture.Service
+﻿using ScreenGIFCapture.Screen;
+
+namespace ScreenGIFCapture.Service
 {
     using System.Collections.Generic;
     using System.Drawing;
     using System.Windows.Forms;
     using ScreenGIFCapture.Base;
+    using ScreenGIFCapture.Images;
 
-
-    internal class WindowsServices : IServices
+    public class WindowsServices : IServices
     {
         public Rectangle DesktopRectangle => SystemInformation.VirtualScreen;
 
         public IEnumerable<IScreen> EnumerateScreens()
         {
-            throw new System.NotImplementedException();
+            return ScreenWrapper.Enumerate();
+        }
+
+        public IBitmapImage Capture(Rectangle region)
+        {
+            return BitmapCapture.Capture(region);
         }
     }
 }

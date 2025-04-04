@@ -13,6 +13,5 @@
             return platformServices.EnumerateScreens().FirstOrDefault();
         }
 
-
     }
 }
