@@ -19,7 +19,7 @@ namespace ScreenGIFCapture.Controls
     public partial class MainWindow : Window
     {
         public MainViewModel ViewModel;
-
+        public bool _isStop = false;
 
         public MainWindow()
         {
@@ -47,7 +47,7 @@ namespace ScreenGIFCapture.Controls
             img.Save(file, ImageFormat.Png);
         }
 
-        private void RecordScreenClick(object sender, RoutedEventArgs e)
+        private async void RecordScreenClick(object sender, RoutedEventArgs e)
         {
             if (DataContext is MainViewModel mainViewModel)
             {
@@ -57,31 +57,41 @@ namespace ScreenGIFCapture.Controls
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                 string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
                 string file = Path.Combine(desktop, $"{date}.gif");
-                //ToRecord(rectangle, file);
+                await Task.Run(() => ToRecord(rectangle, file));
             }
-            //Task.Run(() => ToRecord(rectangle, file));
 
         }
 
         private void ToRecord(Rectangle rectangle, string gifPath)
         {
-            using (var gifCreator = GifLibrary.AnimatedGif.Create(gifPath))
+
+            Task task1 = Task.Run(() =>
             {
-                using (var provider = new GifRegionProvider(rectangle))
+                using (var gifCreator = GifLibrary.AnimatedGif.Create(gifPath))
                 {
-                    while (true)
+                    using (var provider = new GifRegionProvider(rectangle))
                     {
-                        Bitmap img = provider.Capture();
-                        gifCreator.AddFrame(img);
-                        img.Dispose();
+                        while (_isStop != true)
+                        {
+                            Bitmap img = provider.Capture();
+                            gifCreator.AddFrame(img);
+                            img.Dispose();
+                        }
                     }
                 }
-            }
+            });
+
+            Task.WaitAll(task1);
+            _isStop = false;
         }
 
         private void StopScreenClick(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            if (DataContext is MainViewModel mainViewModel)
+            {
+                mainViewModel.Recoding = false;
+            }
+            _isStop = true;
         }
     }
 }
