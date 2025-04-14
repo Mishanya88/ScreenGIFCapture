@@ -1,4 +1,9 @@
-﻿namespace ScreenGIFCapture
+﻿using System.Drawing;
+using System.Threading.Tasks;
+using ScreenGIFCapture.Gif;
+using ScreenGIFCapture.ViewModels;
+
+namespace ScreenGIFCapture.Controls
 {
     using System;
     using System.IO;
@@ -13,9 +18,14 @@
     /// </summary>
     public partial class MainWindow : Window
     {
+        public MainViewModel ViewModel;
+
+
         public MainWindow()
         {
             InitializeComponent();
+            ViewModel = new MainViewModel();
+            DataContext = ViewModel;
         }
 
         private void ScreenButtonClick(object sender, RoutedEventArgs e)
@@ -35,6 +45,43 @@
             string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
             string file = Path.Combine(desktop, $"{date}.png");
             img.Save(file, ImageFormat.Png);
+        }
+
+        private void RecordScreenClick(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel mainViewModel)
+            {
+                mainViewModel.Recoding = true;
+                IScreen screen = ScreenWindow.GetScreen();
+                Rectangle rectangle = screen.Rectangle;
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+                string file = Path.Combine(desktop, $"{date}.gif");
+                //ToRecord(rectangle, file);
+            }
+            //Task.Run(() => ToRecord(rectangle, file));
+
+        }
+
+        private void ToRecord(Rectangle rectangle, string gifPath)
+        {
+            using (var gifCreator = GifLibrary.AnimatedGif.Create(gifPath))
+            {
+                using (var provider = new GifRegionProvider(rectangle))
+                {
+                    while (true)
+                    {
+                        Bitmap img = provider.Capture();
+                        gifCreator.AddFrame(img);
+                        img.Dispose();
+                    }
+                }
+            }
+        }
+
+        private void StopScreenClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

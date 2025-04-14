@@ -1,15 +1,18 @@
-﻿<Window x:Class="ScreenGIFCapture.MainWindow"
+﻿<Window x:Class="ScreenGIFCapture.Controls.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ScreenGIFCapture"
+        xmlns:vm ="clr-namespace:ScreenGIFCapture.ViewModels"
+        xmlns:converters="clr-namespace:ScreenGIFCapture.Converters"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
         UseLayoutRounding="True"
         Title="GifCapture"
         ResizeMode="CanMinimize">
     <Window.Resources>
+        <converters:NegatingConverter x:Key="NegatingConverter" />
+        <converters:VisibilityConverter x:Key="VisibilityConverter" />
         <Style x:Key="FocusVisual">
             <Setter Property="Control.Template">
                 <Setter.Value>
@@ -68,6 +71,54 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="ButtonStyle2" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" Padding="5" Background="{TemplateBinding Background}">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            RenderTransformOrigin="0.5,0.5">
+                                <ContentPresenter.RenderTransform>
+                                    <ScaleTransform CenterX="0.5" CenterY="0.5" />
+                                </ContentPresenter.RenderTransform>
+                            </ContentPresenter>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" TargetName="border" Value="#C1C1C1" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="Gray" />
+                            </Trigger>
+
+                            <EventTrigger RoutedEvent="Button.Click">
+                                <EventTrigger.Actions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="contentPresenter"
+                                   Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                   From="1" To="0.6" Duration="0:0:0.1"
+                                   AutoReverse="True" />
+                                            <DoubleAnimation Storyboard.TargetName="contentPresenter"
+                                   Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                   From="1" To="0.6" Duration="0:0:0.1"
+                                   AutoReverse="True" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger.Actions>
+                            </EventTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <StackPanel>
         <Border BorderThickness="0" SnapsToDevicePixels="True" Background="White">
@@ -81,11 +132,47 @@
                             <TextBlock Text="Screen" Margin="0 5 0 0"/>
                         </StackPanel>
                     </Button.Content>
-
                 </Button>
-
-
+                <Button Style="{StaticResource ButtonStyle1}"
+                        Click="RecordScreenClick"
+                        x:Name="RecordScreen">
+                    <Button.Content>
+                        <StackPanel>
+                            <Image Source="/Controls/WindowScreen.png" Width="40" />
+                            <TextBlock Text="RecordScreen" Margin="0 5 0 0"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
             </StackPanel>
+        </Border>
+        <Border SnapsToDevicePixels = "True" 
+                BorderThickness="0 1 0 0"
+                BorderBrush="LightGray"
+                Visibility="{Binding Recoding, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" Style="{StaticResource ButtonStyle2}"
+                        Click="StopScreenClick"
+                        Background ="#EEEEEE"
+                        IsEnabled="{Binding Path = Recording, Mode=OneWay}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Controls/stop.png" Width="30" />
+                            <TextBlock Foreground="#1E1C1C" Margin="5 0 0 0" VerticalAlignment="Center">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} | {1}s">
+                                        <!--<Binding Source="{x:Static p:Resources.StopRecording}" Mode="OneWay" />
+                                        <Binding Path="ElapsedSeconds" Mode="OneWay" />-->
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </Grid>
         </Border>
     </StackPanel>
 </Window>
