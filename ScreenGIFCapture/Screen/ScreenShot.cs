@@ -10,7 +10,7 @@
 
         public static IBitmapImage CaptureImage(Rectangle rectangle)
         {
-            var platform = ServiceProvider.ServicesPlatform;
+            var platform = ServiceProvider.IServicesPlatform;
             return platform.Capture(rectangle);
         }
     }

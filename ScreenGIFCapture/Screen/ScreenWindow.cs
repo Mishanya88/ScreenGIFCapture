@@ -9,7 +9,7 @@
 
         public static IScreen GetScreen()
         {
-            var platformServices = ServiceProvider.ServicesPlatform;
+            var platformServices = ServiceProvider.IServicesPlatform;
             return platformServices.EnumerateScreens().FirstOrDefault();
         }
 
