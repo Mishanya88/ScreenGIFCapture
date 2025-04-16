@@ -3,11 +3,11 @@
 
     public static class ServiceProvider
     {
-        public static readonly IServices ServicesPlatform;
+        public static readonly IServices IServicesPlatform;
 
         static ServiceProvider()
         {
-            ServicesPlatform = new WindowsServices();
+            IServicesPlatform = new WindowsServices();
         }
     }
 }

@@ -1,14 +1,15 @@
-﻿using ScreenGIFCapture.Images;
-
-namespace ScreenGIFCapture.Service
+﻿namespace ScreenGIFCapture.Service
 {
-    using ScreenGIFCapture.Base;
     using System.Collections.Generic;
     using System.Drawing;
+    using ScreenGIFCapture.Base;
+    using ScreenGIFCapture.Images;
 
     public interface IServices
     {
         IEnumerable<IScreen> EnumerateScreens();
+
+        IEnumerable<IWindow> EnumerateAllWindows();
 
         Rectangle DesktopRectangle { get; }
 
