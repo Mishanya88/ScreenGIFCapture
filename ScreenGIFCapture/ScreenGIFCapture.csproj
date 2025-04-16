@@ -10,6 +10,9 @@
 
 	<ItemGroup>
 	  <None Remove="Controls\stop.png" />
+	  <None Remove="Icons\full.png" />
+	  <None Remove="Icons\region.png" />
+	  <None Remove="Icons\window.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -21,11 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Controls\stop.png" />
-    <Resource Include="Controls\WindowScreen.png" />
+    <Folder Include="Converters\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Converters\" />
+    <Resource Include="Icons\full.png" />
+    <Resource Include="Icons\region.png" />
+    <Resource Include="Icons\window.png" />
   </ItemGroup>
 </Project>

@@ -138,11 +138,22 @@
                         x:Name="RecordScreen">
                     <Button.Content>
                         <StackPanel>
-                            <Image Source="/Controls/WindowScreen.png" Width="40" />
-                            <TextBlock Text="RecordScreen" Margin="0 5 0 0"/>
+                            <Image Source="/Icons/full.png" Width="40" />
+                            <TextBlock Text="RecordScreen" Margin="0 7 0 0"/>
                         </StackPanel>
                     </Button.Content>
                 </Button>
+                <Button Style="{StaticResource ButtonStyle1}"
+                        Click="RecordRegionClick"
+                        x:Name="RecordRegion">
+                    <Button.Content>
+                        <StackPanel>
+                            <Image Source="/Icons/region.png" Height = "35" Width="40" />
+                            <TextBlock Text="RecordScreen" Margin="0 6 0 0"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+
             </StackPanel>
         </Border>
         <Border SnapsToDevicePixels = "True" 

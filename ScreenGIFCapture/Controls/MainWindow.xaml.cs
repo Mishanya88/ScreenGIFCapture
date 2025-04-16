@@ -12,6 +12,8 @@ namespace ScreenGIFCapture.Controls
     using ScreenGIFCapture.Base;
     using ScreenGIFCapture.Images;
     using ScreenGIFCapture.Screen;
+    using GifLibrary;
+    using Window = System.Windows.Window;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -74,7 +76,7 @@ namespace ScreenGIFCapture.Controls
                         while (_isStop != true)
                         {
                             Bitmap img = provider.Capture();
-                            gifCreator.AddFrame(img);
+                            gifCreator.AddFrame(img, quality: GifQuality.Bit8);
                             img.Dispose();
                         }
                     }
@@ -92,6 +94,18 @@ namespace ScreenGIFCapture.Controls
                 mainViewModel.Recoding = false;
             }
             _isStop = true;
+        }
+
+        private void RecordRegionClick(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel mainViewModel)
+            {
+                IScreen screen = ScreenWindow.GetScreen();
+
+                Rectangle? rectangle = RegionWindow.PickRegion();
+
+
+            }
         }
     }
 }

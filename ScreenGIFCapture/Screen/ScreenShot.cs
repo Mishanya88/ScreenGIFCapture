@@ -6,7 +6,11 @@
 
     public static class ScreenShot
     {
-
+        public static IBitmapImage Capture()
+        {
+            var platformServices = ServiceProvider.IServicesPlatform;
+            return CaptureImage(platformServices.DesktopRectangle);
+        }
 
         public static IBitmapImage CaptureImage(Rectangle rectangle)
         {

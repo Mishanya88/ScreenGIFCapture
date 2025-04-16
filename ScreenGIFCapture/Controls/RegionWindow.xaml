@@ -1,0 +1,25 @@
+﻿<Window x:Class="ScreenGIFCapture.Controls.RegionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:ScreenGIFCapture.Controls"
+        xmlns:local="clr-namespace:ScreenGIFCapture.Controls"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        Cursor="Cross"
+        ResizeMode="NoResize">
+    <Grid>
+        <Grid Name="RootGrid"
+              RenderOptions.BitmapScalingMode="NearestNeighbor"
+              Background="Azure"
+              MouseMove="CursorMouseMove"
+              MouseLeftButtonDown="CursorMouseLeftButtonDown"
+              MouseLeftButtonUp="CursorMouseLeftButtonUp">
+            <Image Name="BgImg" />
+
+            <controls:PictureRegion x:Name="PuncturedRegion"/>
+
+        </Grid>
+    </Grid>
+</Window>

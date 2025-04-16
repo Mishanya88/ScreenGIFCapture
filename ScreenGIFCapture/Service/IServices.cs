@@ -13,6 +13,8 @@
 
         Rectangle DesktopRectangle { get; }
 
+        Point CursorPosition { get; }
+
         IBitmapImage Capture(Rectangle region);
     }
 }

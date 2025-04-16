@@ -2,6 +2,7 @@
 {
     using System.Drawing;
     using System.Drawing.Imaging;
+    using System.IO;
 
     public class BitmapImage : IBitmapImage
     {
@@ -19,6 +20,11 @@
         public void Save(string fileName, ImageFormat format)
         {
             Image.Save(fileName, format);
+        }
+
+        public void Save(Stream stream, ImageFormat format)
+        {
+            Image.Save(stream, format);
         }
 
         public void Dispose()

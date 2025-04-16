@@ -3,6 +3,7 @@
 namespace ScreenGIFCapture.Images
 {
     using System;
+    using System.IO;
 
     public interface IBitmapImage : IDisposable
     {
@@ -12,5 +13,6 @@ namespace ScreenGIFCapture.Images
 
         void Save(string fileName, ImageFormat format);
 
+        void Save(Stream stream, ImageFormat format);
     }
 }
