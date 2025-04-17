@@ -124,16 +124,6 @@
         <Border BorderThickness="0" SnapsToDevicePixels="True" Background="White">
             <StackPanel Orientation="Horizontal" Margin="10 10 10 0">
                 <Button Style="{StaticResource ButtonStyle1}"
-                        x:Name="ScreenButton"
-                        Click="ScreenButtonClick">
-                    <Button.Content>
-                        <StackPanel>
-                            <Image Source="/Controls/WindowScreen.png" Width="40" />
-                            <TextBlock Text="Screen" Margin="0 5 0 0"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                <Button Style="{StaticResource ButtonStyle1}"
                         Click="RecordScreenClick"
                         x:Name="RecordScreen">
                     <Button.Content>
@@ -168,10 +158,10 @@
                 <Button Grid.Row="0" Style="{StaticResource ButtonStyle2}"
                         Click="StopScreenClick"
                         Background ="#EEEEEE"
-                        IsEnabled="{Binding Path = Recording, Mode=OneWay}">
+                        IsEnabled="{Binding Path = Recoding, Mode=OneWay}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Controls/stop.png" Width="30" />
+                            <Image Source="/Icons/stop.png" Width="35" />
                             <TextBlock Foreground="#1E1C1C" Margin="5 0 0 0" VerticalAlignment="Center">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0} | {1}s">

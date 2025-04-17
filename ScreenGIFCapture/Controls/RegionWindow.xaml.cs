@@ -1,22 +1,23 @@
-﻿using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
-using ScreenGIFCapture.Base;
-using ScreenGIFCapture.Images;
-using ScreenGIFCapture.Screen;
-using ScreenGIFCapture.Service;
-using BitmapImage = System.Windows.Media.Imaging.BitmapImage;
-using Point = System.Windows.Point;
-using Window = System.Windows.Window;
-
-namespace ScreenGIFCapture.Controls
+﻿namespace ScreenGIFCapture.Controls
 {
+    using System;
+    using System.Diagnostics;
+    using System.Drawing;
+    using System.Drawing.Imaging;
+    using System.IO;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Input;
+    using System.Windows.Media.Imaging;
+    using ScreenGIFCapture.Base;
+    using ScreenGIFCapture.Images;
+    using ScreenGIFCapture.Screen;
+    using ScreenGIFCapture.Service;
+    using BitmapImage = System.Windows.Media.Imaging.BitmapImage;
+    using Point = System.Windows.Point;
+    using Window = System.Windows.Window;
+
+
     /// <summary>
     /// Логика взаимодействия для RegionWindow.xaml
     /// </summary>
@@ -133,27 +134,27 @@ namespace ScreenGIFCapture.Controls
 
                 HighlightRegion(r.Value);
             }
-            else
-            {
-                System.Drawing.Point point = _platformServices.CursorPosition;
-                _selectedWindow = _windows
-                    .Where(w => Predicate?.Invoke(w) ?? true)
-                    .FirstOrDefault(w => w.Rectangle.Contains(point));
+            //else
+            //{
+            //    System.Drawing.Point point = _platformServices.CursorPosition;
+            //    _selectedWindow = _windows
+            //        .Where(w => Predicate?.Invoke(w) ?? true)
+            //        .FirstOrDefault(w => w.Rectangle.Contains(point));
 
-                if (_selectedWindow == null)
-                {
-                    UpdateSizeDisplay(null);
-                    Unhighlight();
-                }
-                else
-                {
-                    Rect? rect = GetSelectedWindowRectangle();
-                    Debug.Assert(rect != null, nameof(rect) + " != null");
-                    Rect r = rect.Value;
-                    UpdateSizeDisplay(r);
-                    HighlightRegion(r);
-                }
-            }
+            //    if (_selectedWindow == null)
+            //    {
+            //        UpdateSizeDisplay(null);
+            //        Unhighlight();
+            //    }
+            //    else
+            //    {
+            //        Rect? rect = GetSelectedWindowRectangle();
+            //        Debug.Assert(rect != null, nameof(rect) + " != null");
+            //        Rect r = rect.Value;
+            //        UpdateSizeDisplay(r);
+            //        HighlightRegion(r);
+            //    }
+            //}
         }
 
         void Unhighlight()
@@ -234,5 +235,11 @@ namespace ScreenGIFCapture.Controls
 
             Close();
         }
+
+        private void CloseClick(object sender, ExecutedRoutedEventArgs e)
+        {
+            _start = _end = null;
+            Close();
+        }   
     }
 }

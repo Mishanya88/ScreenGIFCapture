@@ -14,6 +14,7 @@ namespace ScreenGIFCapture.Controls
     using ScreenGIFCapture.Screen;
     using GifLibrary;
     using Window = System.Windows.Window;
+    using System.Net.NetworkInformation;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -76,7 +77,7 @@ namespace ScreenGIFCapture.Controls
                         while (_isStop != true)
                         {
                             Bitmap img = provider.Capture();
-                            gifCreator.AddFrame(img, quality: GifQuality.Bit8);
+                            gifCreator.AddFrame(img);
                             img.Dispose();
                         }
                     }
@@ -96,14 +97,21 @@ namespace ScreenGIFCapture.Controls
             _isStop = true;
         }
 
-        private void RecordRegionClick(object sender, RoutedEventArgs e)
+        private async void RecordRegionClick(object sender, RoutedEventArgs e)
         {
             if (DataContext is MainViewModel mainViewModel)
             {
-                IScreen screen = ScreenWindow.GetScreen();
-
                 Rectangle? rectangle = RegionWindow.PickRegion();
+                if (rectangle == null) 
+                {
+                    return;
+                }
 
+                mainViewModel.Recoding = true;
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+                string file = Path.Combine(desktop, $"{date}.gif");
+                await Task.Run(() => ToRecord(rectangle.Value, file));
 
             }
         }

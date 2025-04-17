@@ -2,13 +2,19 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:ScreenGIFCapture.Controls"
-        xmlns:local="clr-namespace:ScreenGIFCapture.Controls"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
         Topmost="True"
         Cursor="Cross"
         ResizeMode="NoResize">
+    <Window.InputBindings>
+        <KeyBinding Command="Close" Key="Escape"/>
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="Close" Executed="CloseClick"/>
+    </Window.CommandBindings>
+
     <Grid>
         <Grid Name="RootGrid"
               RenderOptions.BitmapScalingMode="NearestNeighbor"
@@ -17,6 +23,10 @@
               MouseLeftButtonDown="CursorMouseLeftButtonDown"
               MouseLeftButtonUp="CursorMouseLeftButtonUp">
             <Image Name="BgImg" />
+
+            <Rectangle x:Name="DarkOverlay"
+                       Fill="#66000000"
+                       Visibility="{Binding OverlayVisibility, ElementName=PuncturedRegion}" />
 
             <controls:PictureRegion x:Name="PuncturedRegion"/>
 
