@@ -1,0 +1,28 @@
+﻿<Window x:Class="ScreenGIFCapture.Controls.VideoSourcePickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        Cursor="Cross"
+        ResizeMode="NoResize">
+    <Window.InputBindings>
+        <KeyBinding Command="Close" Key="Escape" />
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="Close" Executed="CloseClick" />
+    </Window.CommandBindings>
+    <Grid x:Name="RootGrid"
+          Background="#66000000"
+          MouseMove="WindowMouseMove"
+          MouseLeftButtonDown="WindowMouseLeftButtonDown">
+        <Border x:Name="Border"
+                BorderBrush="Red"
+                BorderThickness="2"
+                SnapsToDevicePixels="True"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top" />
+    </Grid>
+</Window>

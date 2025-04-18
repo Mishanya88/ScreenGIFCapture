@@ -11,6 +11,8 @@
 
         IEnumerable<IWindow> EnumerateAllWindows();
 
+        IEnumerable<IWindow> EnumerateWindows();
+
         Rectangle DesktopRectangle { get; }
 
         Point CursorPosition { get; }

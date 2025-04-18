@@ -8,6 +8,7 @@
     using GifCapture.Native.Structs;
     using System.Collections.Generic;
     using System.Linq;
+    using GifCapture.Native.Enums;
 
     public class Window : IWindow
     {
@@ -59,6 +60,19 @@
             this.Handle = handle;
         }
 
+        public IEnumerable<Window> EnumerateChildren()
+        {
+            var list = new List<Window>();
+            User32.EnumChildWindows(Handle, (Handle, Param) =>
+            {
+                var wh = new Window(Handle);
+                list.Add(wh);
+                return true;
+            }, IntPtr.Zero);
+
+            return list;
+        }
+
         public static IEnumerable<Window> Enumerate()
         {
             var list = new List<Window>();
@@ -72,34 +86,34 @@
             return list;
         }
 
-        IEnumerable<Window> GetAllChildren(Window window)
+        public static IEnumerable<Window> EnumerateVisible()
         {
-            var children = window
-                .EnumerateChildren()
-                .Where(w => w.IsVisible);
-
-            foreach (var child in children)
+            foreach (var window in Enumerate().Where(w => w.IsVisible && !string.IsNullOrWhiteSpace(w.Title)))
             {
-                foreach (var grandchild in GetAllChildren(child))
+                var hWnd = window.Handle;
+
+                if (!User32.GetWindowLong(hWnd, GetWindowLongValue.ExStyle).HasFlag(WindowStyles.AppWindow))
                 {
-                    yield return grandchild;
+                    if (User32.GetWindow(hWnd, GetWindowEnum.Owner) != IntPtr.Zero)
+                        continue;
+
+                    if (User32.GetWindowLong(hWnd, GetWindowLongValue.ExStyle).HasFlag(WindowStyles.ToolWindow))
+                        continue;
+
+                    if (User32.GetWindowLong(hWnd, GetWindowLongValue.Style).HasFlag(WindowStyles.Child))
+                        continue;
                 }
+
+                const int dwmCloaked = 14;
+
+                // Exclude suspended Windows apps
+                DwmApi.DwmGetWindowAttribute(hWnd, dwmCloaked, out var cloaked, Marshal.SizeOf<bool>());
+
+                if (cloaked)
+                    continue;
+
+                yield return window;
             }
-
-            yield return window;
-        }
-
-        public IEnumerable<Window> EnumerateChildren()
-        {
-            var list = new List<Window>();
-            User32.EnumChildWindows(Handle, (Handle, Param) =>
-            {
-                var wh = new Window(Handle);
-                list.Add(wh);
-                return true;
-            }, IntPtr.Zero);
-
-            return list;
         }
     }
 }

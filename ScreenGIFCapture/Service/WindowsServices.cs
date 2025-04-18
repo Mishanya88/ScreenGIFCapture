@@ -42,6 +42,11 @@ namespace ScreenGIFCapture.Service
                 .SelectMany(GetAllChildren);
         }
 
+        public IEnumerable<IWindow> EnumerateWindows()
+        {
+            return Window.EnumerateVisible();
+        }
+
         IEnumerable<Window> GetAllChildren(Window window)
         {
             var children = window

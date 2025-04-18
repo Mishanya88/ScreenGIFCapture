@@ -144,6 +144,16 @@
                     </Button.Content>
                 </Button>
 
+                <Button Style="{StaticResource ButtonStyle1}"
+                        Click="RecordWindowClick"
+                        x:Name="RecordWindow">
+                    <Button.Content>
+                        <StackPanel>
+                            <Image Source="/Icons/window.png" Height = "35" Width="40" />
+                            <TextBlock Text="RecordWindow" Margin="0 6 0 0"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
             </StackPanel>
         </Border>
         <Border SnapsToDevicePixels = "True" 

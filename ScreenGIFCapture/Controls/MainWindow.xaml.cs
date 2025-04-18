@@ -77,7 +77,7 @@ namespace ScreenGIFCapture.Controls
                         while (_isStop != true)
                         {
                             Bitmap img = provider.Capture();
-                            gifCreator.AddFrame(img);
+                            gifCreator.AddFrame(img, 100, quality: GifQuality.Bit8);
                             img.Dispose();
                         }
                     }
@@ -113,6 +113,25 @@ namespace ScreenGIFCapture.Controls
                 string file = Path.Combine(desktop, $"{date}.gif");
                 await Task.Run(() => ToRecord(rectangle.Value, file));
 
+            }
+        }
+
+        private async void RecordWindowClick(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel mainViewModel)
+            {
+                IWindow target = VideoSourcePickerWindow.PickWindow();
+
+                if (target == null)
+                {
+                    return;
+                }
+
+                mainViewModel.Recoding = true;
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+                string file = Path.Combine(desktop, $"{date}.gif");
+                await Task.Run(() => ToRecord(target.Rectangle, file));
             }
         }
     }
