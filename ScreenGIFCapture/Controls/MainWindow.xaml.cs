@@ -1,9 +1,4 @@
-﻿using System.Drawing;
-using System.Threading.Tasks;
-using ScreenGIFCapture.Gif;
-using ScreenGIFCapture.ViewModels;
-
-namespace ScreenGIFCapture.Controls
+﻿namespace ScreenGIFCapture.Controls
 {
     using System;
     using System.IO;
@@ -12,9 +7,12 @@ namespace ScreenGIFCapture.Controls
     using ScreenGIFCapture.Base;
     using ScreenGIFCapture.Images;
     using ScreenGIFCapture.Screen;
+    using System.Drawing;
+    using System.Threading.Tasks;
+    using ScreenGIFCapture.Gif;
+    using ScreenGIFCapture.ViewModels;
     using GifLibrary;
     using Window = System.Windows.Window;
-    using System.Net.NetworkInformation;
     using System.Threading;
     using System.Diagnostics;
 
@@ -148,8 +146,13 @@ namespace ScreenGIFCapture.Controls
                         {
                             if (_isPaused)
                             {
+                                sw.Stop();
                                 Thread.Sleep(100);
                                 continue;
+                            }
+                            else
+                            {
+                                sw.Start();
                             }
 
                             Bitmap img = provider.Capture();
@@ -165,6 +168,5 @@ namespace ScreenGIFCapture.Controls
             Task.WaitAll(task1);
             _isStop = false;
         }
-
     }
 }
