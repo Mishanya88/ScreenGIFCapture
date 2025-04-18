@@ -16,6 +16,7 @@ namespace ScreenGIFCapture.Controls
     using Window = System.Windows.Window;
     using System.Net.NetworkInformation;
     using System.Threading;
+    using System.Diagnostics;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -37,6 +38,7 @@ namespace ScreenGIFCapture.Controls
         }
 
         public void PauseRecording() => _isPaused = true;
+
         public void ResumeRecording() => _isPaused = false;
 
         public void StopScreenClick(object sender, RoutedEventArgs e)
@@ -82,7 +84,7 @@ namespace ScreenGIFCapture.Controls
                 _recordBar?.Close();
                 _recordBar = new RecordBar(mainViewModel, rectangle);
                 _recordBar.Show();
-                await Task.Run(() => ToRecord(rectangle, file));
+                await Task.Run(() => ToRecord(rectangle, file, mainViewModel));
             }
 
         }
@@ -104,7 +106,7 @@ namespace ScreenGIFCapture.Controls
                 _recordBar?.Close();
                 _recordBar = new RecordBar(mainViewModel, rectangle.Value);
                 _recordBar.Show();
-                await Task.Run(() => ToRecord(rectangle.Value, file));
+                await Task.Run(() => ToRecord(rectangle.Value, file, mainViewModel));
 
             }
         }
@@ -128,15 +130,16 @@ namespace ScreenGIFCapture.Controls
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                 string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
                 string file = Path.Combine(desktop, $"{date}.gif");
-                await Task.Run(() => ToRecord(target.Rectangle, file));
+                await Task.Run(() => ToRecord(target.Rectangle, file, mainViewModel));
             }
         }
 
-        private void ToRecord(Rectangle rectangle, string gifPath)
+        private void ToRecord(Rectangle rectangle, string gifPath, MainViewModel mainViewModel)
         {
-
             Task task1 = Task.Run(() =>
             {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
                 using (var gifCreator = GifLibrary.AnimatedGif.Create(gifPath))
                 {
                     using (var provider = new GifRegionProvider(rectangle))
@@ -152,6 +155,8 @@ namespace ScreenGIFCapture.Controls
                             Bitmap img = provider.Capture();
                             gifCreator.AddFrame(img, 100, quality: GifQuality.Bit8);
                             img.Dispose();
+                            Dispatcher.Invoke(() => { mainViewModel.ElapsedSeconds =
+                                (int)sw.Elapsed.TotalSeconds; });
                         }
                     }
                 }

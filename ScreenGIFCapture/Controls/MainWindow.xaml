@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm ="clr-namespace:ScreenGIFCapture.ViewModels"
         xmlns:converters="clr-namespace:ScreenGIFCapture.Converters"
+        xmlns:p="clr-namespace:ScreenGIFCapture.Properties"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
         UseLayoutRounding="True"
@@ -175,8 +176,8 @@
                             <TextBlock Foreground="#1E1C1C" Margin="5 0 0 0" VerticalAlignment="Center">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0} | {1}s">
-                                        <!--<Binding Source="{x:Static p:Resources.StopRecording}" Mode="OneWay" />
-                                        <Binding Path="ElapsedSeconds" Mode="OneWay" />-->
+                                        <Binding Source="StopRecording" Mode="OneWay" />
+                                        <Binding Path="ElapsedSeconds" Mode="OneWay" />
                                     </MultiBinding>
                                 </TextBlock.Text>
                             </TextBlock>
