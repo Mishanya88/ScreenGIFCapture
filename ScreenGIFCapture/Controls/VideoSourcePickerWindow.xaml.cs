@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using ScreenGIFCapture.Base;
-using ScreenGIFCapture.Images;
-using ScreenGIFCapture.Screen;
-using ScreenGIFCapture.Service;
-using Window = System.Windows.Window;
-
-namespace ScreenGIFCapture.Controls
+﻿namespace ScreenGIFCapture.Controls
 {
+    using System;
+    using System.Drawing;
+    using System.Drawing.Imaging;
+    using System.IO;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Input;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+    using ScreenGIFCapture.Base;
+    using ScreenGIFCapture.Images;
+    using ScreenGIFCapture.Screen;
+    using ScreenGIFCapture.Service;
+    using Window = System.Windows.Window;
+
+
     /// <summary>
     /// Логика взаимодействия для VideoSourcePickerWindow.xaml
     /// </summary>

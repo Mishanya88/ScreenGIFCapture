@@ -1,7 +1,6 @@
 ﻿namespace ScreenGIFCapture.Controls
 {
     using System;
-    using System.Diagnostics;
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.IO;
@@ -121,77 +120,30 @@
 
         private void CursorMouseMove(object sender, MouseEventArgs e)
         {
-            if (_isDragging)
+            if (!_isDragging)
             {
-                _end = e.GetPosition(RootGrid);
-                Rect? r = GetRegion();
-                UpdateSizeDisplay(r);
-                if (r == null)
-                {
-                    Unhighlight();
-                    return;
-                }
-
-                HighlightRegion(r.Value);
+                return;
             }
-            //else
-            //{
-            //    System.Drawing.Point point = _platformServices.CursorPosition;
-            //    _selectedWindow = _windows
-            //        .Where(w => Predicate?.Invoke(w) ?? true)
-            //        .FirstOrDefault(w => w.Rectangle.Contains(point));
 
-            //    if (_selectedWindow == null)
-            //    {
-            //        UpdateSizeDisplay(null);
-            //        Unhighlight();
-            //    }
-            //    else
-            //    {
-            //        Rect? rect = GetSelectedWindowRectangle();
-            //        Debug.Assert(rect != null, nameof(rect) + " != null");
-            //        Rect r = rect.Value;
-            //        UpdateSizeDisplay(r);
-            //        HighlightRegion(r);
-            //    }
-            //}
+            _end = e.GetPosition(RootGrid);
+            Rect? r = GetRegion();
+            if (r == null)
+            {
+                Unhighlight();
+                return;
+            }
+
+            HighlightRegion(r.Value);
         }
 
-        void Unhighlight()
+        private void Unhighlight()
         {
-            //StripedBorder.Visibility = Visibility.Collapsed;
             PuncturedRegion.Region = null;
         }
 
-        void HighlightRegion(Rect region)
+        private void HighlightRegion(Rect region)
         {
-            //StripedBorder.Margin = new Thickness(region.X, region.Y, 0, 0);
-            //StripedBorder.Width = region.Width;
-            //StripedBorder.Height = region.Height;
             PuncturedRegion.Region = region;
-            //StripedBorder.Visibility = Visibility.Visible;
-        }
-
-        private void UpdateSizeDisplay(Rect? rect)
-        {
-            if (rect == null)
-            {
-                //SizeTextBlock.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                Rect r = rect.Value;
-                //SizeTextBlock.Text = $"{(int) r.Width} x {(int) r.Height}";
-                //SizeTextBlock.Margin = new Thickness(
-                //r.Left + r.Width / 2 - SizeTextBlock.ActualWidth / 2,
-                //r.Top + r.Height / 2 - SizeTextBlock.ActualHeight / 2,
-                //0,
-                //0);
-                //SizeTextBlock.Visibility = Visibility.Visible;
-
-                System.Drawing.Point point = _platformServices.CursorPosition;
-                //Magnifier.UpdatePositionTextBlock(new Point(point.X, point.Y), new System.Windows.Size(r.Width, r.Height));
-            }
         }
 
         private void CursorMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -6,24 +6,12 @@
 
     public partial class PictureRegion : UserControl
     {
-        
-        //public static readonly DependencyProperty RegionProperty = DependencyProperty.Register(
-        //    nameof(Region),
-        //    typeof(Rect?),
-        //    typeof(PictureRegion),
-        //    new PropertyMetadata(RegionChanged));
-
         public static readonly DependencyProperty OverlayVisibilityProperty =
             DependencyProperty.Register(nameof(OverlayVisibility), typeof(Visibility),
                 typeof(PictureRegion), new PropertyMetadata(Visibility.Visible));
-
-        //public Rect? Region
-        //{
-        //    get => (Rect?)GetValue(RegionProperty);
-        //    set => SetValue(RegionProperty, value);
-        //}
-
+        
         private Rect? _region;
+
         public Rect? Region
         {
             get => _region;
@@ -36,6 +24,7 @@
                 }
             }
         }
+
         public Visibility OverlayVisibility
         {
             get => (Visibility)GetValue(OverlayVisibilityProperty);
@@ -79,43 +68,6 @@
 
             Visibility = Visibility.Visible;
             OverlayVisibility = Visibility.Hidden;
-        }
-
-        private static void RegionChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
-        {
-            if (obj is PictureRegion r)
-            {
-                switch (e.NewValue)
-                {
-                    case null:
-                        r.Visibility = Visibility.Hidden;
-                        break;
-
-                    case Rect region:
-                        var w = r.ActualWidth;
-                        var h = r.ActualHeight;
-
-                        r.BorderTop.Margin = new Thickness();
-                        r.BorderTop.Width = w;
-                        r.BorderTop.Height = region.Top.Clip(0, h);
-
-                        r.BorderBottom.Margin = new Thickness(0, region.Bottom, 0, 0);
-                        r.BorderBottom.Width = w;
-                        r.BorderBottom.Height = (h - region.Bottom).Clip(0, h);
-
-                        r.BorderLeft.Margin = new Thickness(0, region.Top, 0, 0);
-                        r.BorderLeft.Width = region.Left.Clip(0, w);
-                        r.BorderLeft.Height = region.Height;
-
-                        r.BorderRight.Margin = new Thickness(region.Right, region.Top, 0, 0);
-                        r.BorderRight.Width = (w - region.Right).Clip(0, w);
-                        r.BorderRight.Height = region.Height;
-
-                        r.Visibility = Visibility.Visible;
-                        r.OverlayVisibility = Visibility.Hidden;
-                        break;
-                }
-            }
         }
     }
 }
