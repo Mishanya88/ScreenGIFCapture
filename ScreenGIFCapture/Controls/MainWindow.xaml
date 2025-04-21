@@ -157,6 +157,23 @@
                 </Button>
             </StackPanel>
         </Border>
+        <Border BorderThickness="0 1 0 0" BorderBrush="#B9B9B9" SnapsToDevicePixels="True"
+                Padding="10 4">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Delay"
+                           VerticalAlignment="Center">
+                </TextBlock>
+                <ComboBox VerticalAlignment="Center"
+                          Margin="4 "
+                          SelectedIndex="{Binding DelayIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="24">
+                    <ComboBoxItem>0 s</ComboBoxItem>
+                    <ComboBoxItem>2 s</ComboBoxItem>
+                    <ComboBoxItem>4 s</ComboBoxItem>
+                    <ComboBoxItem>6 s</ComboBoxItem>
+                    <ComboBoxItem>8 s</ComboBoxItem>
+                </ComboBox>
+                </StackPanel>
+            </Border>
         <Border SnapsToDevicePixels = "True" 
                 BorderThickness="0 1 0 0"
                 BorderBrush="LightGray"
@@ -186,5 +203,21 @@
                 </Button>
             </Grid>
         </Border>
+        <Border BorderBrush="#B9B9B9" BorderThickness="0 1 0 0" SnapsToDevicePixels="True"
+                Padding="10 2"
+                Background="#E9EBEC">
+        </Border>
+
+        <TextBlock Text="{Binding CountdownSeconds}"
+                   FontSize="30"
+                   FontWeight="Bold"
+                   Foreground="Red"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   Margin="0,20,0,0"
+                   Visibility="{Binding CountdownSeconds, Converter={StaticResource VisibilityConverter}}"/>
     </StackPanel>
+    
+
+
 </Window>

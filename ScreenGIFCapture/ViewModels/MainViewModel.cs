@@ -4,6 +4,10 @@
     {
         private bool _recoding = false;
         private int _elapsedSeconds;
+        private int _delayIndex;
+        private int _countdownSeconds;
+
+        public readonly int Fps = 10;
 
         public bool Recoding
         {
@@ -15,6 +19,18 @@
         {
             get => _elapsedSeconds;
             set => Set(ref _elapsedSeconds, value);
+        }
+
+        public int DelayIndex
+        {
+            get => _delayIndex;
+            set => Set(ref _delayIndex, value);
+        }
+
+        public int CountdownSeconds
+        {
+            get => _countdownSeconds;
+            set => Set(ref _countdownSeconds, value);
         }
     }
 }

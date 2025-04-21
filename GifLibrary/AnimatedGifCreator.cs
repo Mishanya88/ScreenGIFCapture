@@ -1,26 +1,30 @@
-﻿using System.IO;
-using System.Drawing;
-using System;
-namespace GifLibrary
+﻿namespace GifLibrary
 {
+    using System.IO;
+    using System.Drawing;
+    using System;
+
     public class AnimatedGifCreator : IDisposable
     {
         private readonly Stream _stream;
-        private int _repeat;
+        private readonly int _repeat;
         private int _frameCount;
-        private string _filePath;
+        private readonly string _filePath;
         private bool _createdHeader;
+        private int _delay;
 
-        public AnimatedGifCreator(Stream stream, int repeat = 0)
+        public AnimatedGifCreator(Stream stream, int delay = 33, int repeat = 0)
         {
             _repeat = repeat;
             _stream = stream;
+            _delay = delay;
         }
 
-        public AnimatedGifCreator(string filePath, int repeat = 0)
+        public AnimatedGifCreator(string filePath, int delay = 33, int repeat = 0)
         {
             _repeat = repeat;
             _filePath = filePath;
+            _delay = delay;
 
             _stream = new FileStream(_filePath, FileMode.Create, FileAccess.Write, FileShare.Read);
         }
@@ -29,6 +33,8 @@ namespace GifLibrary
         ///     Add a new frame to the GIF
         /// </summary>
         /// <param name="image">Изображение для добавления в стек GIF</param>
+        /// <param name="delay">Задержка в миллисекундах этот GIF-файл будет отображаться с задержкой
+        /// (-1: указывает на задержку свойства класса)</param>
         /// <param name="quality">Качество GIF-файлов</param>
         public void AddFrame(Image image, int delay = -1, GifQuality quality = GifQuality.Default)
         {
@@ -43,7 +49,7 @@ namespace GifLibrary
                 _createdHeader = true;
             }
 
-            AppendToStream(CreateGraphicsControlExtensionBlock(-1));
+            AppendToStream(CreateGraphicsControlExtensionBlock(delay > -1 ? delay : _delay));
             AppendToStream(gif.ImageDescriptor.ToArray());
             AppendToStream(gif.ColorTable.ToArray());
             AppendToStream(gif.ImageData.ToArray());
