@@ -1,0 +1,23 @@
+﻿<Window x:Class="ScreenGIFCapture.Controls.CountdownWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:ScreenGIFCapture.Converters"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterScreen"
+        IsHitTestVisible="False"
+        Width="200" Height="150">
+
+    <Grid>
+        <TextBlock Text="{Binding CountdownSeconds}"
+                   FontSize="72"
+                   FontWeight="Bold"
+                   Foreground="Red"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+    </Grid>
+</Window>

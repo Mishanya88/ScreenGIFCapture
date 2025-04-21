@@ -26,11 +26,5 @@
             get => _delayIndex;
             set => Set(ref _delayIndex, value);
         }
-
-        public int CountdownSeconds
-        {
-            get => _countdownSeconds;
-            set => Set(ref _countdownSeconds, value);
-        }
     }
 }

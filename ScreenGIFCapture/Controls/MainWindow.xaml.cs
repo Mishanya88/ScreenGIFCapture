@@ -2,10 +2,8 @@
 {
     using System;
     using System.IO;
-    using System.Drawing.Imaging;
     using System.Windows;
     using ScreenGIFCapture.Base;
-    using ScreenGIFCapture.Images;
     using ScreenGIFCapture.Screen;
     using System.Drawing;
     using System.Threading.Tasks;
@@ -54,63 +52,18 @@
             _isStop = true;
         }
 
-        private async Task DelayAsync(MainViewModel viewModel)
-        {
-            int delaySeconds;
-
-            switch (viewModel.DelayIndex)
-            {
-                case 1:
-                    delaySeconds = 2;
-                    break;
-                case 2:
-                    delaySeconds = 4;
-                    break;
-                case 3:
-                    delaySeconds = 6;
-                    break;
-                case 4:
-                    delaySeconds = 8;
-                    break;
-                default:
-                    delaySeconds = 0;
-                    break;
-            }
-
-            viewModel.CountdownSeconds = delaySeconds;
-
-            while (viewModel.CountdownSeconds > 0)
-            {
-                await Task.Delay(1000);
-                viewModel.CountdownSeconds--;
-            }
-        }
-
-        private void ScreenButtonClick(object sender, RoutedEventArgs e)
-        {
-            IScreen screen = ScreenWindow.GetScreen();
-
-            if (screen != null)
-            {
-                IBitmapImage img = ScreenShot.CaptureImage(screen.Rectangle);
-                SaveScreenShot(img);
-            }
-        }
-
-        private void SaveScreenShot(IBitmapImage img)
-        {
-            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
-            string file = Path.Combine(desktop, $"{date}.png");
-            img.Save(file, ImageFormat.Png);
-        }
-
         private async void RecordScreenClick(object sender, RoutedEventArgs e)
         {
             if (DataContext is MainViewModel mainViewModel)
             {
                 mainViewModel.Recoding = true;
-                await DelayAsync(mainViewModel);
+
+                int delaySeconds = GetDelaySeconds(mainViewModel.DelayIndex);
+                if (delaySeconds > 0)
+                {
+                    var countdownWindow = new CountdownWindow(delaySeconds);
+                    countdownWindow.ShowDialog();
+                }
 
                 IScreen screen = ScreenWindow.GetScreen();
                 Rectangle rectangle = screen.Rectangle;
@@ -139,8 +92,13 @@
                     new Rect(captureArea.Value.Left, captureArea.Value.Top,
                         captureArea.Value.Width, captureArea.Value.Height));
                 _overlayWindow.Show();
+                int delaySeconds = GetDelaySeconds(mainViewModel.DelayIndex);
 
-                await DelayAsync(mainViewModel);
+                if (delaySeconds > 0)
+                {
+                    var countdownWindow = new CountdownWindow(delaySeconds);
+                    countdownWindow.ShowDialog();
+                }
 
                 mainViewModel.Recoding = true;
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -165,7 +123,12 @@
                     return;
                 }
 
-                await DelayAsync(mainViewModel);
+                int delaySeconds = GetDelaySeconds(mainViewModel.DelayIndex);
+                if (delaySeconds > 0)
+                {
+                    var countdownWindow = new CountdownWindow(delaySeconds);
+                    countdownWindow.ShowDialog();
+                }
 
                 _recordBar?.Close();
                 _recordBar = new RecordBar(mainViewModel, target.Rectangle);
@@ -232,6 +195,23 @@
 
             Task.WaitAll(task1);
             _isStop = false;
+        }
+
+        private int GetDelaySeconds(int delayIndex)
+        {
+            switch (delayIndex)
+            {
+                case 1:
+                    return 2;
+                case 2:
+                    return 4;
+                case 3:
+                    return 6;
+                case 4:
+                    return 8;
+                default:
+                    return 0;
+            }
         }
 
         private void Sleep(int ms)
