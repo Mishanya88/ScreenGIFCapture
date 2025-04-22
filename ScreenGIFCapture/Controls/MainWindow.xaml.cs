@@ -19,12 +19,13 @@
     /// </summary>
     public partial class MainWindow : Window
     {
+        private RecordBar _recordBar;
+        private OverlayWindow _overlayWindow;
         public MainViewModel ViewModel;
         public bool _isStop = false;
         public bool _isPaused = false;
+
         public static MainWindow Instance { get; private set; }
-        private RecordBar _recordBar;
-        private OverlayWindow _overlayWindow;
 
         public MainWindow()
         {
@@ -183,7 +184,7 @@
                             prev = curr;
 
                             Bitmap img = provider.Capture();
-                            gifCreator.AddFrame(img, currentDelay, quality: GifQuality.Bit8);
+                            gifCreator.AddFrame(img, currentDelay, quality: mainViewModel.SelectedCodec);
                             img.Dispose();
                             Dispatcher.Invoke(() => { mainViewModel.ElapsedSeconds =
                                 (int)sw.Elapsed.TotalSeconds; });
@@ -227,6 +228,13 @@
             {
                 Thread.SpinWait(1);
             }
+        }
+
+        private void OpenSettingsWindow(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow settingsWindow = new SettingsWindow();
+            settingsWindow.Owner = this;
+            settingsWindow.ShowDialog();
         }
     }
 }

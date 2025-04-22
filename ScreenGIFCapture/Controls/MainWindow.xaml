@@ -172,6 +172,7 @@
                     <ComboBoxItem>6 s</ComboBoxItem>
                     <ComboBoxItem>8 s</ComboBoxItem>
                 </ComboBox>
+                <Button Content="Settings" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="30" Click="OpenSettingsWindow"/>
                 </StackPanel>
             </Border>
         <Border SnapsToDevicePixels = "True" 

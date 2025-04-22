@@ -1,4 +1,6 @@
-﻿namespace ScreenGIFCapture.ViewModels
+﻿using GifLibrary;
+
+namespace ScreenGIFCapture.ViewModels
 {
     public class MainViewModel : NotifyPropertyChanged
     {
@@ -6,8 +8,20 @@
         private int _elapsedSeconds;
         private int _delayIndex;
         private int _countdownSeconds;
+        private int _fps = 10; 
+        private GifQuality _selectedCodec = GifQuality.Bit8;
 
-        public readonly int Fps = 10;
+        public int Fps
+        {
+            get => _fps;
+            set => Set(ref _fps, value);
+        }
+
+        public int DelayIndex
+        {
+            get => _delayIndex;
+            set => Set(ref _delayIndex, value);
+        }
 
         public bool Recoding
         {
@@ -21,10 +35,10 @@
             set => Set(ref _elapsedSeconds, value);
         }
 
-        public int DelayIndex
+        public GifQuality SelectedCodec
         {
-            get => _delayIndex;
-            set => Set(ref _delayIndex, value);
+            get => _selectedCodec;
+            set => Set(ref _selectedCodec, value);
         }
     }
 }
