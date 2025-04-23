@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using GifLibrary;
 
 namespace ScreenGIFCapture.Settings
@@ -7,6 +8,7 @@ namespace ScreenGIFCapture.Settings
     {
         public int Fps { get; set; }
         public string SelectedCodec { get; set; } = GifQuality.Bit8.ToString();
+        public string FilePath { get; set; }
 
         public GifQuality GetCodec() =>
             Enum.TryParse<GifQuality>(SelectedCodec, out var codec) ? codec : GifQuality.Bit8;

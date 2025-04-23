@@ -70,7 +70,7 @@
                 Rectangle rectangle = screen.Rectangle;
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                 string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
-                string file = Path.Combine(desktop, $"{date}.gif");
+                string file = Path.Combine(mainViewModel.FilePath, $"{date}.gif");
                 _recordBar?.Close();
                 _recordBar = new RecordBar(mainViewModel, rectangle);
                 _recordBar.Show();
@@ -104,7 +104,7 @@
                 mainViewModel.Recoding = true;
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                 string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
-                string file = Path.Combine(desktop, $"{date}.gif");
+                string file = Path.Combine(mainViewModel.FilePath, $"{date}.gif");
                 _recordBar?.Close();
                 _recordBar = new RecordBar(mainViewModel, captureArea.Value);
                 _recordBar.Show();
@@ -138,7 +138,7 @@
                 mainViewModel.Recoding = true;
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                 string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
-                string file = Path.Combine(desktop, $"{date}.gif");
+                string file = Path.Combine(mainViewModel.FilePath, $"{date}.gif");
                 await Task.Run(() => ToRecord(target.Rectangle, 1000 / mainViewModel.Fps, file, mainViewModel));
             }
         }
@@ -232,7 +232,7 @@
 
         private void OpenSettingsWindow(object sender, RoutedEventArgs e)
         {
-            SettingsWindow settingsWindow = new SettingsWindow();
+            SettingsWindow settingsWindow = new SettingsWindow(ViewModel);
             settingsWindow.Owner = this;
             settingsWindow.ShowDialog();
         }

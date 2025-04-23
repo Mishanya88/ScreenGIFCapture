@@ -24,7 +24,8 @@ namespace ScreenGIFCapture.Settings
             var settings = new SettingsModel
             {
                 Fps = viewModel.Fps,
-                SelectedCodec = viewModel.SelectedCodec.ToString()
+                SelectedCodec = viewModel.SelectedCodec.ToString(),
+                FilePath = viewModel.FilePath
             };
 
             File.WriteAllText(SettingsFile, JsonConvert.SerializeObject(settings, SerializerSettings));
@@ -41,18 +42,37 @@ namespace ScreenGIFCapture.Settings
                 var settings = JsonConvert.DeserializeObject<SettingsModel>(json);
 
                 // Валидация и установка значений по умолчанию при необходимости
-                if (settings.Fps <= 0) settings.Fps = 10;
+                if (settings.Fps <= 0)
+                {
+                    settings.Fps = 10;
+                }
 
                 if (!Enum.TryParse(settings.SelectedCodec, out GifQuality _))
+                {
                     settings.SelectedCodec = GifQuality.Bit8.ToString();
+                }
+
+                settings.FilePath = GetDefaultSavePath();
 
                 return settings;
             }
             catch (Exception ex) when (ex is JsonException || ex is IOException)
             {
-                // В случае ошибки возвращаем настройки по умолчанию
                 return CreateDefaultSettings();
             }
+        }
+
+        public static string GetDefaultSavePath()
+        {
+            string picturesFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            string savePath = Path.Combine(picturesFolder, "ScreenGIF");
+
+            if (!Directory.Exists(savePath))
+            {
+                Directory.CreateDirectory(savePath);
+            }
+
+            return savePath;
         }
 
         private static SettingsModel CreateDefaultSettings()
@@ -60,7 +80,8 @@ namespace ScreenGIFCapture.Settings
             return new SettingsModel
             {
                 Fps = 10,
-                SelectedCodec = GifQuality.Bit8.ToString()
+                SelectedCodec = GifQuality.Bit8.ToString(),
+                FilePath = GetDefaultSavePath()
             };
         }
     }

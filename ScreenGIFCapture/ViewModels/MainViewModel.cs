@@ -1,4 +1,5 @@
 ﻿using GifLibrary;
+using ScreenGIFCapture.Settings;
 
 namespace ScreenGIFCapture.ViewModels
 {
@@ -7,8 +8,8 @@ namespace ScreenGIFCapture.ViewModels
         private bool _recoding = false;
         private int _elapsedSeconds;
         private int _delayIndex;
-        private int _countdownSeconds;
-        private int _fps = 10; 
+        private int _fps = 10;
+        private string _filePath = SettingsManager.GetDefaultSavePath();
         private GifQuality _selectedCodec = GifQuality.Bit8;
 
         public int Fps
@@ -39,6 +40,12 @@ namespace ScreenGIFCapture.ViewModels
         {
             get => _selectedCodec;
             set => Set(ref _selectedCodec, value);
+        }
+
+        public string FilePath
+        {
+            get => _filePath;
+            set => Set(ref _filePath, value);
         }
     }
 }
