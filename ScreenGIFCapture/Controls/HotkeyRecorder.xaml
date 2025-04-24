@@ -7,10 +7,10 @@
         Topmost="True"
         ShowInTaskbar="False"
         Visibility="Visible"
-        AllowsTransparency="True"
+
         Background="#B2000000"
         Title="HotkeyRecorder"
-        WindowStyle="None"
+
         WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
@@ -23,6 +23,7 @@
                      TextAlignment="Center"
                      IsReadOnly="True"
                      FontSize="16"
+                     TextChanged="TargetTextBox_TextChanged"
                      Margin="0,0,0,10">
                 <TextBox.Effect>
                     <DropShadowEffect ShadowDepth="0" Opacity="1" BlurRadius="5"/>

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-
-namespace ScreenGIFCapture.Controls
+﻿namespace ScreenGIFCapture.Controls
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Input;
+
     /// <summary>
     /// Логика взаимодействия для HotkeyRecorder.xaml
     /// </summary>
@@ -25,6 +19,7 @@ namespace ScreenGIFCapture.Controls
         private List<string> keyNames = new List<string>();
         private bool clearHotkey = false;
         private bool hotkeyHasBeenRecorded = false;
+        private readonly List<Key> pressedModifiers = new List<Key>();
 
         public int[] CapturedKeys => keys;
 
@@ -33,7 +28,15 @@ namespace ScreenGIFCapture.Controls
             InitializeComponent();
             targetTextBox = target;
             Loaded += HotkeyRecorder_Loaded;
+            targetTextBox.TextChanged += TargetTextBox_TextChanged;
+            MuteShortcut.Text = targetTextBox.Text;
         }
+
+        public HotkeyRecorder()
+        {
+            InitializeComponent();
+        }
+
 
         private void HotkeyRecorder_Loaded(object sender, RoutedEventArgs e)
         {
@@ -43,7 +46,12 @@ namespace ScreenGIFCapture.Controls
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.Key)
+            Key key = (e.Key == Key.System) ? e.SystemKey : e.Key;
+
+            if (IsModifierKey(key) && !pressedModifiers.Contains(key))
+                pressedModifiers.Add(key);
+
+            switch (key)
             {
                 case Key.Escape:
                     CloseRecorder();
@@ -65,6 +73,11 @@ namespace ScreenGIFCapture.Controls
 
         private void OnKeyUp(object sender, KeyEventArgs e)
         {
+            Key key = (e.Key == Key.System) ? e.SystemKey : e.Key;
+
+            if (pressedModifiers.Contains(key))
+                pressedModifiers.Remove(key);
+
             e.Handled = true;
             clearHotkey = !KeysDown().Any();
 
@@ -74,40 +87,42 @@ namespace ScreenGIFCapture.Controls
             }
         }
 
-        private void Record(KeyEventArgs e)
+        private async void Record(KeyEventArgs e)
         {
             Key key = (e.Key == Key.System) ? e.SystemKey : e.Key;
 
-            if (key == Key.LWin || key == Key.RWin)
-                return;
-
             e.Handled = true;
 
-            if (hotkeyHasBeenRecorded)
-            {
-                if (clearHotkey)
-                {
-                    Array.Clear(keys, 0, keys.Length);
-                    keyNames.Clear();
-                    hotkeyHasBeenRecorded = false;
-                }
-            }
-            else
-            {
-                if (!IsModifierKey(key))
-                {
-                    keys[0] = (int)key;
-                    keyNames.Add(key.ToString());
-                    hotkeyHasBeenRecorded = true;
-                    targetTextBox.Text = string.Join("+", keyNames);
+            if (hotkeyHasBeenRecorded && !clearHotkey)
+                return;
 
-                    // Завершаем запись после ввода основной клавиши
-                    CloseRecorder();
-                }
-                else
+            if (hotkeyHasBeenRecorded && clearHotkey)
+            {
+                Array.Clear(keys, 0, keys.Length);
+                keyNames.Clear();
+                hotkeyHasBeenRecorded = false;
+            }
+
+            RecordAndDisplayModKeys();
+
+            if (!IsModifierKey(key))
+            {
+                keys[0] = (int)key;
+                keyNames.Add(key.ToString());
+                hotkeyHasBeenRecorded = true;
+
+                string display = string.Join("+", keyNames);
+                targetTextBox.Text = display;
+                //HotkeyDisplay = display;
+
+                await Task.Delay(100);
+                CloseRecorder();
+
+                HotkeySaved?.Invoke(new RecordedHotkey
                 {
-                    RecordAndDisplayModKeys();
-                }
+                    Key = keys[0],
+                    Modifiers = keys[1]
+                });
             }
         }
 
@@ -116,38 +131,54 @@ namespace ScreenGIFCapture.Controls
             keyNames.Clear();
             keys[1] = 0;
 
-            if ((Keyboard.Modifiers & ModifierKeys.Control) > 0)
+            foreach (Key modKey in pressedModifiers)
             {
-                keys[1] |= (int)WindowsHotkeys.KeyModifier.Ctrl;
-                keyNames.Add("Ctrl");
-            }
-            if ((Keyboard.Modifiers & ModifierKeys.Shift) > 0)
-            {
-                keys[1] |= (int)WindowsHotkeys.KeyModifier.Shift;
-                keyNames.Add("Shift");
-            }
-            if ((Keyboard.Modifiers & ModifierKeys.Alt) > 0)
-            {
-                keys[1] |= (int)WindowsHotkeys.KeyModifier.Alt;
-                keyNames.Add("Alt");
+                switch (modKey)
+                {
+                    case Key.LeftCtrl:
+                    case Key.RightCtrl:
+                        keys[1] |= (int)WindowsHotkeys.KeyModifier.Ctrl;
+                        if (!keyNames.Contains("Ctrl")) keyNames.Add("Ctrl");
+                        break;
+
+                    case Key.LeftShift:
+                    case Key.RightShift:
+                        keys[1] |= (int)WindowsHotkeys.KeyModifier.Shift;
+                        if (!keyNames.Contains("Shift")) keyNames.Add("Shift");
+                        break;
+
+                    case Key.LeftAlt:
+                    case Key.RightAlt:
+                        keys[1] |= (int)WindowsHotkeys.KeyModifier.Alt;
+                        if (!keyNames.Contains("Alt")) keyNames.Add("Alt");
+                        break;
+
+                    case Key.LWin:
+                    case Key.RWin:
+                        keys[1] |= (int)WindowsHotkeys.KeyModifier.Win;
+                        if (!keyNames.Contains("Win")) keyNames.Add("Win");
+                        break;
+                }
             }
 
-            targetTextBox.Text = string.Join("+", keyNames);
+            string display = string.Join("+", keyNames);
+            targetTextBox.Text = display;
+            //HotkeyDisplay = display;
         }
 
         private bool IsModifierKey(Key key)
         {
             return key == Key.LeftCtrl || key == Key.RightCtrl ||
                    key == Key.LeftAlt || key == Key.RightAlt ||
-                   key == Key.LeftShift || key == Key.RightShift;
+                   key == Key.LeftShift || key == Key.RightShift ||
+                   key == Key.LWin || key == Key.RWin;
         }
 
         private static IEnumerable<Key> KeysDown()
         {
             foreach (Key key in Enum.GetValues(typeof(Key)))
             {
-                if (key != Key.None && Keyboard.IsKeyDown(key) &&
-                    key != Key.LWin && key != Key.RWin)
+                if (key != Key.None && Keyboard.IsKeyDown(key))
                     yield return key;
             }
         }
@@ -161,6 +192,30 @@ namespace ScreenGIFCapture.Controls
             }
             Close();
         }
+
+        private void TargetTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            MuteShortcut.Text = targetTextBox.Text;
+        }
+
+        public struct RecordedHotkey
+        {
+            public int Key { get; set; }
+            public int Modifiers { get; set; }
+
+            public override string ToString()
+            {
+                var parts = new List<string>();
+                if ((Modifiers & (int)WindowsHotkeys.KeyModifier.Ctrl) != 0) parts.Add("Ctrl");
+                if ((Modifiers & (int)WindowsHotkeys.KeyModifier.Shift) != 0) parts.Add("Shift");
+                if ((Modifiers & (int)WindowsHotkeys.KeyModifier.Alt) != 0) parts.Add("Alt");
+                if ((Modifiers & (int)WindowsHotkeys.KeyModifier.Win) != 0) parts.Add("Win");
+                parts.Add(((Key)Key).ToString());
+                return string.Join("+", parts);
+            }
+        }
+
+        public event Action<RecordedHotkey> HotkeySaved;
 
         public static class WindowsHotkeys
         {

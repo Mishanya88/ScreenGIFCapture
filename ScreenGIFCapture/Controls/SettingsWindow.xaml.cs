@@ -34,8 +34,8 @@
             {
                 var recorder = new HotkeyRecorder(textBox);
                 recorder.Owner = this;
-                this.IsHitTestVisible = false;
-                this.ResizeMode = ResizeMode.NoResize;
+                //this.IsHitTestVisible = false;
+                //this.ResizeMode = ResizeMode.NoResize;
                 recorder.ShowDialog();
             }
         }
