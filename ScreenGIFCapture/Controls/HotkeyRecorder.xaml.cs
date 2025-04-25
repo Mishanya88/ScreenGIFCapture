@@ -7,6 +7,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+    using ScreenGIFCapture.Settings;
 
     /// <summary>
     /// Логика взаимодействия для HotkeyRecorder.xaml
@@ -32,11 +33,22 @@
             MuteShortcut.Text = targetTextBox.Text;
         }
 
-        public HotkeyRecorder()
+        public static HashSet<Key> ConvertToKeySet(RecordedHotkey hotkey)
         {
-            InitializeComponent();
-        }
+            var keys = new HashSet<Key>();
 
+            if ((hotkey.Modifiers & (int)HotkeyRecorder.WindowsHotkeys.KeyModifier.Ctrl) != 0)
+                keys.Add(Key.LeftCtrl);
+            if ((hotkey.Modifiers & (int)HotkeyRecorder.WindowsHotkeys.KeyModifier.Shift) != 0)
+                keys.Add(Key.LeftShift);
+            if ((hotkey.Modifiers & (int)HotkeyRecorder.WindowsHotkeys.KeyModifier.Alt) != 0)
+                keys.Add(Key.LeftAlt);
+            if ((hotkey.Modifiers & (int)HotkeyRecorder.WindowsHotkeys.KeyModifier.Win) != 0)
+                keys.Add(Key.LWin);
+
+            keys.Add((Key)hotkey.Key);
+            return keys;
+        }
 
         private void HotkeyRecorder_Loaded(object sender, RoutedEventArgs e)
         {
@@ -113,7 +125,6 @@
 
                 string display = string.Join("+", keyNames);
                 targetTextBox.Text = display;
-                //HotkeyDisplay = display;
 
                 await Task.Delay(100);
                 CloseRecorder();
@@ -163,7 +174,6 @@
 
             string display = string.Join("+", keyNames);
             targetTextBox.Text = display;
-            //HotkeyDisplay = display;
         }
 
         private bool IsModifierKey(Key key)
@@ -196,23 +206,6 @@
         private void TargetTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             MuteShortcut.Text = targetTextBox.Text;
-        }
-
-        public struct RecordedHotkey
-        {
-            public int Key { get; set; }
-            public int Modifiers { get; set; }
-
-            public override string ToString()
-            {
-                var parts = new List<string>();
-                if ((Modifiers & (int)WindowsHotkeys.KeyModifier.Ctrl) != 0) parts.Add("Ctrl");
-                if ((Modifiers & (int)WindowsHotkeys.KeyModifier.Shift) != 0) parts.Add("Shift");
-                if ((Modifiers & (int)WindowsHotkeys.KeyModifier.Alt) != 0) parts.Add("Alt");
-                if ((Modifiers & (int)WindowsHotkeys.KeyModifier.Win) != 0) parts.Add("Win");
-                parts.Add(((Key)Key).ToString());
-                return string.Join("+", parts);
-            }
         }
 
         public event Action<RecordedHotkey> HotkeySaved;

@@ -9,10 +9,12 @@
     using System.Threading.Tasks;
     using ScreenGIFCapture.Gif;
     using ScreenGIFCapture.ViewModels;
-    using GifLibrary;
     using Window = System.Windows.Window;
     using System.Threading;
     using System.Diagnostics;
+    using System.Collections.Generic;
+    using ScreenGIFCapture.Settings;
+    using System.Windows.Input;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -24,7 +26,9 @@
         public MainViewModel ViewModel;
         public bool _isStop = false;
         public bool _isPaused = false;
-
+        private HashSet<Key> _pressedKeys = new HashSet<Key>();
+        private Dictionary<HashSet<Key>, Action> _hotkeys =
+            new Dictionary<HashSet<Key>, Action>();
         public static MainWindow Instance { get; private set; }
 
         public MainWindow()
@@ -33,6 +37,10 @@
             ViewModel = new MainViewModel();
             Instance = this;
             DataContext = ViewModel;
+
+            RegisterHotkeys(ViewModel);
+            this.KeyDown += OnKeyDown;
+            this.KeyUp += OnKeyUp;
         }
 
         public void PauseRecording() => _isPaused = true;
@@ -51,6 +59,48 @@
                 mainViewModel.ElapsedSeconds = 0;
             }
             _isStop = true;
+        }
+
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            _pressedKeys.Add(e.Key);
+
+            foreach (var entry in _hotkeys)
+            {
+                if (entry.Key.SetEquals(_pressedKeys))
+                {
+                    entry.Value?.Invoke();
+                    break;
+                }
+            }
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            _pressedKeys.Remove(e.Key);
+        }
+
+        private void RegisterHotkeys(MainViewModel vm)
+        {
+            _hotkeys.Clear();
+
+            _hotkeys[HotkeyRecorder.ConvertToKeySet(vm.RegionHotkey)] = () =>
+                RecordRegionClick(this, null);
+
+            _hotkeys[HotkeyRecorder.ConvertToKeySet(vm.FullScreenHotkey)] = () =>
+                RecordScreenClick(this, null);
+
+            _hotkeys[HotkeyRecorder.ConvertToKeySet(vm.PauseHotkey)] = () =>
+            {
+                if (_isPaused)
+                {
+                    ResumeRecording();
+                }
+                else
+                {
+                    PauseRecording();
+                }
+            };
         }
 
         private async void RecordScreenClick(object sender, RoutedEventArgs e)

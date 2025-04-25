@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Windows.Input;
 using System.Xml;
 using GifLibrary;
 using Newtonsoft.Json;
+using ScreenGIFCapture.Controls;
 using ScreenGIFCapture.ViewModels;
+using static ScreenGIFCapture.Controls.HotkeyRecorder;
 
 namespace ScreenGIFCapture.Settings
 {
@@ -25,7 +29,10 @@ namespace ScreenGIFCapture.Settings
             {
                 Fps = viewModel.Fps,
                 SelectedCodec = viewModel.SelectedCodec.ToString(),
-                FilePath = viewModel.FilePath
+                FilePath = viewModel.FilePath,
+                RegionHotkey = viewModel.RegionHotkey,
+                FullScreenHotkey = viewModel.FullScreenHotkey,
+                PauseHotkey = viewModel.PauseHotkey
             };
 
             File.WriteAllText(SettingsFile, JsonConvert.SerializeObject(settings, SerializerSettings));
@@ -41,7 +48,33 @@ namespace ScreenGIFCapture.Settings
                 var json = File.ReadAllText(SettingsFile);
                 var settings = JsonConvert.DeserializeObject<SettingsModel>(json);
 
-                // Валидация и установка значений по умолчанию при необходимости
+                if (settings.RegionHotkey.Key == 0 && settings.RegionHotkey.Modifiers == 0)
+                { 
+                    settings.RegionHotkey = new RecordedHotkey
+                    {
+                        Key = (int)System.Windows.Forms.Keys.F2,
+                        Modifiers = (int)WindowsHotkeys.KeyModifier.Alt
+                    };
+                }
+
+                if (settings.FullScreenHotkey.Key == 0 && settings.FullScreenHotkey.Modifiers == 0)
+                {
+                    settings.FullScreenHotkey = new RecordedHotkey
+                    {
+                        Key = (int)System.Windows.Forms.Keys.S,
+                        Modifiers = (int)WindowsHotkeys.KeyModifier.Ctrl
+                    };
+                }
+
+                if (settings.PauseHotkey.Key == 0 && settings.PauseHotkey.Modifiers == 0)
+                {
+                    settings.PauseHotkey = new RecordedHotkey
+                    {
+                        Key = (int)System.Windows.Forms.Keys.F3,
+                        Modifiers = (int)WindowsHotkeys.KeyModifier.Win
+                    };
+                }
+
                 if (settings.Fps <= 0)
                 {
                     settings.Fps = 10;
@@ -81,7 +114,22 @@ namespace ScreenGIFCapture.Settings
             {
                 Fps = 10,
                 SelectedCodec = GifQuality.Bit8.ToString(),
-                FilePath = GetDefaultSavePath()
+                FilePath = GetDefaultSavePath(),
+                RegionHotkey = new RecordedHotkey
+                {
+                    Key = (int)Key.S,
+                    Modifiers = (int)WindowsHotkeys.KeyModifier.Ctrl
+                },
+                FullScreenHotkey = new RecordedHotkey
+                {
+                    Key = (int)Key.F,
+                    Modifiers = (int)WindowsHotkeys.KeyModifier.Ctrl
+                },
+                PauseHotkey = new RecordedHotkey
+                {
+                    Key = (int)Key.S,
+                    Modifiers = (int)WindowsHotkeys.KeyModifier.Win
+                }
             };
         }
     }

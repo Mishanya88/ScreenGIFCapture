@@ -10,6 +10,7 @@
     using Window = System.Windows.Window;
     using ScreenGIFCapture.Settings;
     using ScreenGIFCapture.ViewModels;
+    using System;
 
     /// <summary>
     /// Логика взаимодействия для SettingsWindow.xaml
@@ -20,11 +21,9 @@
         {
             InitializeComponent();
 
-            var settings = SettingsManager.LoadSettings();
-            viewModel.Fps = settings.Fps;
-            viewModel.SelectedCodec = settings.GetCodec();
-            viewModel.FilePath = settings.FilePath;
-
+            RegionCaptureHotkeyTextBox.Text = viewModel.RegionHotkey.ToString();
+            FullScreenCaptureHotkeyTextBox.Text = viewModel.FullScreenHotkey.ToString();
+            TogglePauseHotkeyTextBox.Text = viewModel.PauseHotkey.ToString();
             this.DataContext = viewModel;
         }
 
@@ -34,8 +33,25 @@
             {
                 var recorder = new HotkeyRecorder(textBox);
                 recorder.Owner = this;
-                //this.IsHitTestVisible = false;
-                //this.ResizeMode = ResizeMode.NoResize;
+
+                recorder.HotkeySaved += hotkey =>
+                {
+                    textBox.Text = hotkey.ToString();
+
+                    if (textBox == RegionCaptureHotkeyTextBox)
+                    {
+                        MainWindow.Instance.ViewModel.RegionHotkey = hotkey;
+                    }
+                    else if (textBox == FullScreenCaptureHotkeyTextBox)
+                    {
+                        MainWindow.Instance.ViewModel.FullScreenHotkey = hotkey;
+                    }
+                    else if (textBox == TogglePauseHotkeyTextBox)
+                    {
+                        MainWindow.Instance.ViewModel.PauseHotkey = hotkey;
+                    }
+                };
+
                 recorder.ShowDialog();
             }
         }
@@ -74,5 +90,7 @@
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
+        public event Action<string, RecordedHotkey> HotkeyChanged;
     }
 }

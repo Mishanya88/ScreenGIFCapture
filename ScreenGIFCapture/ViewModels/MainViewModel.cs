@@ -1,4 +1,6 @@
-﻿using GifLibrary;
+﻿using System.Windows.Input;
+using GifLibrary;
+using ScreenGIFCapture.Controls;
 using ScreenGIFCapture.Settings;
 
 namespace ScreenGIFCapture.ViewModels
@@ -11,6 +13,23 @@ namespace ScreenGIFCapture.ViewModels
         private int _fps = 10;
         private string _filePath = SettingsManager.GetDefaultSavePath();
         private GifQuality _selectedCodec = GifQuality.Bit8;
+
+        public MainViewModel()
+        {
+            var settings = SettingsManager.LoadSettings();
+            Fps = settings.Fps;
+            SelectedCodec = settings.GetCodec();
+            FilePath = settings.FilePath;
+            RegionHotkey = settings.RegionHotkey;
+            PauseHotkey = settings.PauseHotkey;
+            FullScreenHotkey = settings.FullScreenHotkey;
+        }
+
+        public RecordedHotkey RegionHotkey { get; set; }
+
+        public RecordedHotkey FullScreenHotkey { get; set; }
+
+        public RecordedHotkey PauseHotkey { get; set; }
 
         public int Fps
         {
