@@ -24,6 +24,7 @@
             RegionCaptureHotkeyTextBox.Text = viewModel.RegionHotkey.ToString();
             FullScreenCaptureHotkeyTextBox.Text = viewModel.FullScreenHotkey.ToString();
             TogglePauseHotkeyTextBox.Text = viewModel.PauseHotkey.ToString();
+            WindowCaptureHotkeyTextBox.Text = viewModel.RecordWindowHotkey.ToString();
             this.DataContext = viewModel;
         }
 
@@ -49,6 +50,10 @@
                     else if (textBox == TogglePauseHotkeyTextBox)
                     {
                         MainWindow.Instance.ViewModel.PauseHotkey = hotkey;
+                    }
+                    else if (textBox == WindowCaptureHotkeyTextBox)
+                    {
+                        MainWindow.Instance.ViewModel.RecordWindowHotkey = hotkey;
                     }
                 };
 
@@ -90,7 +95,5 @@
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-
-        public event Action<string, RecordedHotkey> HotkeyChanged;
     }
 }

@@ -12,9 +12,9 @@
     using Window = System.Windows.Window;
     using System.Threading;
     using System.Diagnostics;
-    using System.Collections.Generic;
+    using GifCapture.Native;
+    using ScreenGIFCapture.Utils;
     using ScreenGIFCapture.Settings;
-    using System.Windows.Input;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -23,24 +23,37 @@
     {
         private RecordBar _recordBar;
         private OverlayWindow _overlayWindow;
+        private bool _isStop = false;
+        private bool _isPaused = false;
+        private bool _toExit = false;
+
         public MainViewModel ViewModel;
-        public bool _isStop = false;
-        public bool _isPaused = false;
-        private HashSet<Key> _pressedKeys = new HashSet<Key>();
-        private Dictionary<HashSet<Key>, Action> _hotkeys =
-            new Dictionary<HashSet<Key>, Action>();
         public static MainWindow Instance { get; private set; }
 
         public MainWindow()
         {
             InitializeComponent();
+
             ViewModel = new MainViewModel();
             Instance = this;
             DataContext = ViewModel;
 
-            RegisterHotkeys(ViewModel);
-            this.KeyDown += OnKeyDown;
-            this.KeyUp += OnKeyUp;
+            this.Loaded += (sender, args) =>
+            {
+                var helper = new System.Windows.Interop.WindowInteropHelper(this);
+                var hwnd = helper.Handle;
+
+                if (hwnd == IntPtr.Zero)
+                {
+                    MessageBox.Show("Ошибка: Нулевой дескриптор окна.");
+                    return;
+                }
+
+                var source = System.Windows.Interop.HwndSource.FromHwnd(hwnd);
+                source.AddHook(HwndHook);
+
+                UpdateHotKeys(hwnd);
+            };
         }
 
         public void PauseRecording() => _isPaused = true;
@@ -61,46 +74,32 @@
             _isStop = true;
         }
 
-        private void OnKeyDown(object sender, KeyEventArgs e)
+        public void UpdateHotKeys(IntPtr hwnd)
         {
-            _pressedKeys.Add(e.Key);
+            User32.UnregisterHotKey(hwnd, 1);
+            User32.UnregisterHotKey(hwnd, 2);
+            User32.UnregisterHotKey(hwnd, 3);
+            User32.UnregisterHotKey(hwnd, 4);
 
-            foreach (var entry in _hotkeys)
-            {
-                if (entry.Key.SetEquals(_pressedKeys))
-                {
-                    entry.Value?.Invoke();
-                    break;
-                }
-            }
+            RegisterHotKeyForAction(hwnd, ViewModel.RegionHotkey, 1);
+            RegisterHotKeyForAction(hwnd, ViewModel.FullScreenHotkey, 2);
+            RegisterHotKeyForAction(hwnd, ViewModel.PauseHotkey, 3);
+            RegisterHotKeyForAction(hwnd, ViewModel.RecordWindowHotkey, 4);
         }
 
-        private void OnKeyUp(object sender, KeyEventArgs e)
+        public void UpdateHotKeys()
         {
-            _pressedKeys.Remove(e.Key);
-        }
+            var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
 
-        private void RegisterHotkeys(MainViewModel vm)
-        {
-            _hotkeys.Clear();
+            User32.UnregisterHotKey(hwnd, 1);
+            User32.UnregisterHotKey(hwnd, 2);
+            User32.UnregisterHotKey(hwnd, 3);
+            User32.UnregisterHotKey(hwnd, 4);
 
-            _hotkeys[HotkeyRecorder.ConvertToKeySet(vm.RegionHotkey)] = () =>
-                RecordRegionClick(this, null);
-
-            _hotkeys[HotkeyRecorder.ConvertToKeySet(vm.FullScreenHotkey)] = () =>
-                RecordScreenClick(this, null);
-
-            _hotkeys[HotkeyRecorder.ConvertToKeySet(vm.PauseHotkey)] = () =>
-            {
-                if (_isPaused)
-                {
-                    ResumeRecording();
-                }
-                else
-                {
-                    PauseRecording();
-                }
-            };
+            RegisterHotKeyForAction(hwnd, ViewModel.RegionHotkey, 1);
+            RegisterHotKeyForAction(hwnd, ViewModel.FullScreenHotkey, 2);
+            RegisterHotKeyForAction(hwnd, ViewModel.PauseHotkey, 3);
+            RegisterHotKeyForAction(hwnd, ViewModel.RecordWindowHotkey, 4);
         }
 
         private async void RecordScreenClick(object sender, RoutedEventArgs e)
@@ -248,6 +247,57 @@
             _isStop = false;
         }
 
+        private void RegisterHotKeyForAction(IntPtr hwnd, RecordedHotkey hotkey, int id)
+        {
+            if (hotkey != null)
+            {
+                User32.RegisterHotKey(hwnd, id, hotkey.Modifiers, hotkey.Key);
+            }
+        }
+
+        private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            const int WM_HOTKEY = 0x0312;
+            if (msg == WM_HOTKEY)
+            {
+                int id = wParam.ToInt32();
+                switch (id)
+                {
+                    case 1:
+                        RecordRegionClick(this, null);
+                        break;
+                    case 2:
+                        RecordScreenClick(this, null);
+                        break;
+                    case 3:
+                        if (ViewModel.Recoding)
+                        {
+                            if (_isPaused)
+                            {
+                                ResumeRecording();
+                            }
+                            else
+                            {
+                                PauseRecording();
+                            }
+                        }
+                        break;
+                    case 4:
+                        RecordWindowClick(this, null);
+                        break;
+                }
+                handled = true;
+            }
+            return IntPtr.Zero;
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            var helper = new System.Windows.Interop.WindowInteropHelper(this);
+            User32.UnregisterHotKey(helper.Handle, 1);
+            base.OnClosed(e);
+        }
+
         private int GetDelaySeconds(int delayIndex)
         {
             switch (delayIndex)
@@ -285,6 +335,33 @@
             SettingsWindow settingsWindow = new SettingsWindow(ViewModel);
             settingsWindow.Owner = this;
             settingsWindow.ShowDialog();
+        }
+
+        private void TaskbarIcon_OnTrayMouseDoubleClick(object sender, RoutedEventArgs e)
+        {
+            if (Visibility == Visibility.Visible)
+            {
+                Hide();
+            }
+            else
+            {
+                this.ShowAndFocus();
+            }
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            if (!_toExit)
+            {
+                e.Cancel = true;
+                Hide();
+            }
+        }
+
+        private void MenuExit_Click(object sender, RoutedEventArgs e)
+        {
+            _toExit = true;
+            Close();
         }
     }
 }

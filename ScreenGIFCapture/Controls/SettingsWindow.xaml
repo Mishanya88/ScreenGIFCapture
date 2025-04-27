@@ -49,21 +49,28 @@
                 <TabItem.Content>
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="20,0,0,10">
-                            <TextBlock Text="Region Capture Hotkey" Width="150"/>
+                            <TextBlock Text="Захват области экрана (RecordRegion)" Width="210"/>
                             <TextBox Name="RegionCaptureHotkeyTextBox" Width="120" Margin="5,0"
                                      IsReadOnly="True" PreviewMouseDown="HotkeyTextBox_MouseDown"
                                      Text="Выберите клавишу"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="20,0,0,10">
-                            <TextBlock Text="Full Screen Capture Hotkey" Width="150"/>
+                            <TextBlock Text="Захват полного экрана (RecordScreen)" Width="210"/>
                             <TextBox Name="FullScreenCaptureHotkeyTextBox" Width="120" Margin="5,0"
                                      IsReadOnly="True" PreviewMouseDown="HotkeyTextBox_MouseDown"
                                      Text="Выберите клавишу"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="20,0,0,10">
-                            <TextBlock Text="Toggle Pause Hotkey" Width="150"/>
+                            <TextBlock Text="Захват окна (RecordWindow)" Width="210"/>
+                            <TextBox Name="WindowCaptureHotkeyTextBox" Width="120" Margin="5,0"
+                                     IsReadOnly="True" PreviewMouseDown="HotkeyTextBox_MouseDown"
+                                     Text="Выберите клавишу"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="20,0,0,10">
+                            <TextBlock Text="Пауза/Вознобновить" Width="210"/>
                             <TextBox Name="TogglePauseHotkeyTextBox" Width="120" Margin="5,0"
                                      IsReadOnly="True" PreviewMouseDown="HotkeyTextBox_MouseDown"
                                      Text="Выберите клавишу"/>

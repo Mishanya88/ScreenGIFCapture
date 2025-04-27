@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:vm ="clr-namespace:ScreenGIFCapture.ViewModels"
         xmlns:converters="clr-namespace:ScreenGIFCapture.Converters"
         xmlns:p="clr-namespace:ScreenGIFCapture.Properties"
@@ -20,6 +21,26 @@
                     <ControlTemplate>
                         <Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true"
                      StrokeThickness="1" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ContextMenuStyle" TargetType="{x:Type ContextMenu}">
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="MinWidth" Value="170" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ContextMenu}">
+                        <Grid Background="Transparent">
+                            <Border Margin="0,0,5,5" Background="White" BorderThickness="1" BorderBrush="LightGray">
+                                <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="2" />
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="3" ShadowDepth="3" Color="Gray" Opacity="0.5" />
+                                </Border.Effect>
+                            </Border>
+                        </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -140,7 +161,7 @@
                     <Button.Content>
                         <StackPanel>
                             <Image Source="/Icons/region.png" Height = "35" Width="40" />
-                            <TextBlock Text="RecordScreen" Margin="0 6 0 0"/>
+                            <TextBlock Text="RecordRegion" Margin="0 6 0 0"/>
                         </StackPanel>
                     </Button.Content>
                 </Button>
@@ -208,6 +229,80 @@
                 Padding="10 2"
                 Background="#E9EBEC">
         </Border>
+        <tb:TaskbarIcon x:Name="TaskbarIcon"
+                        Grid.Row="3"
+                        ToolTipText="GifCapture"
+                        MenuActivation="RightClick"
+                        TrayMouseDoubleClick ="TaskbarIcon_OnTrayMouseDoubleClick">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu Style="{StaticResource ContextMenuStyle}">
+                    <ContextMenu.Resources>
+                        <!-- MenuItem style -->
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="SnapsToDevicePixels" Value="True" />
+                            <Setter Property="OverridesDefaultStyle" Value="True" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                                        <Grid Name="Root" Height="27" Background="White">
+                                            <ContentPresenter Name="HeaderHost" Margin="10,0,0,0"
+                                  ContentSource="Header"
+                                  RecognizesAccessKey="True"
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Center"
+                                  TextOptions.TextRenderingMode="ClearType"
+                                  TextOptions.TextFormattingMode="Display" />
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Root" Property="Background" Value="#91C9F7" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="Root" Property="Background" Value="White" />
+                                            </Trigger>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="Foreground" Value="Gray" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
 
+                        <!-- ContextMenu separator style -->
+                        <Style x:Key="MenuSeparatorStyle" TargetType="{x:Type Separator}">
+                            <Setter Property="SnapsToDevicePixels" Value="True" />
+                            <Setter Property="OverridesDefaultStyle" Value="True" />
+                            <Setter Property="IsTabStop" Value="False" />
+                            <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
+                            <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
+                            <Setter Property="Background" Value="LightGray" />
+                            <Setter Property="Height" Value="5" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Separator}">
+                                        <Border Height="5" Margin="-2,2" VerticalAlignment="Center" Background="{TemplateBinding Background}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ContextMenu.Resources>
+
+                    <Separator Style="{StaticResource MenuSeparatorStyle}" />
+
+                    <MenuItem Header="RecordeWindow" Click="RecordWindowClick"
+              IsEnabled="{Binding Recoding, Mode=OneWay, Converter={StaticResource NegatingConverter}}" />
+                    <MenuItem Header="RecordeRegion" Click="RecordRegionClick"
+              IsEnabled="{Binding Recoding, Mode=OneWay, Converter={StaticResource NegatingConverter}}" />
+                    <MenuItem Header="RecordeScreen" Click="RecordScreenClick"
+              IsEnabled="{Binding Recoding, Mode=OneWay, Converter={StaticResource NegatingConverter}}" />
+                    <MenuItem Header="StopRecording"
+              Click="StopScreenClick"
+              IsEnabled="{Binding Recoding, Mode=OneWay}" />
+                    <Separator Style="{StaticResource MenuSeparatorStyle}" />
+                    <MenuItem Header="Exit" Click ="MenuExit_Click" />
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
     </StackPanel>
 </Window>

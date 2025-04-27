@@ -97,6 +97,22 @@
         [DllImport(DllName)]
         public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
 
+        [DllImport("user32.dll")]
+        public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+
+        [DllImport("user32.dll")]
+        public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+        [Flags]
+        public enum Modifiers : uint
+        {
+            None = 0x0000,
+            Alt = 0x0001,
+            Control = 0x0002,
+            Shift = 0x0004,
+            Win = 0x0008
+        }
+
         public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
     }
 }

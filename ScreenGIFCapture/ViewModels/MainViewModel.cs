@@ -1,10 +1,9 @@
-﻿using System.Windows.Input;
-using GifLibrary;
-using ScreenGIFCapture.Controls;
-using ScreenGIFCapture.Settings;
-
-namespace ScreenGIFCapture.ViewModels
+﻿namespace ScreenGIFCapture.ViewModels
 {
+    using GifLibrary;
+    using ScreenGIFCapture.Controls;
+    using ScreenGIFCapture.Settings;
+
     public class MainViewModel : NotifyPropertyChanged
     {
         private bool _recoding = false;
@@ -13,23 +12,58 @@ namespace ScreenGIFCapture.ViewModels
         private int _fps = 10;
         private string _filePath = SettingsManager.GetDefaultSavePath();
         private GifQuality _selectedCodec = GifQuality.Bit8;
+        private RecordedHotkey _regionHotkey;
+        private RecordedHotkey _fullScreenHotkey;
+        private RecordedHotkey _pauseHotkey;
+        private RecordedHotkey _recordWindowHotkey;
 
-        public MainViewModel()
+        public RecordedHotkey RegionHotkey
         {
-            var settings = SettingsManager.LoadSettings();
-            Fps = settings.Fps;
-            SelectedCodec = settings.GetCodec();
-            FilePath = settings.FilePath;
-            RegionHotkey = settings.RegionHotkey;
-            PauseHotkey = settings.PauseHotkey;
-            FullScreenHotkey = settings.FullScreenHotkey;
+            get => _regionHotkey;
+            set
+            {
+                if (Set(ref _regionHotkey, value))
+                {
+                    MainWindow.Instance?.UpdateHotKeys();
+                }
+            }
         }
 
-        public RecordedHotkey RegionHotkey { get; set; }
+        public RecordedHotkey FullScreenHotkey
+        {
+            get => _fullScreenHotkey;
+            set
+            {
+                if (Set(ref _fullScreenHotkey, value))
+                {
+                    MainWindow.Instance?.UpdateHotKeys();
+                }
+            }
+        }
 
-        public RecordedHotkey FullScreenHotkey { get; set; }
+        public RecordedHotkey PauseHotkey
+        {
+            get => _pauseHotkey;
+            set
+            {
+                if (Set(ref _pauseHotkey, value))
+                {
+                    MainWindow.Instance?.UpdateHotKeys();
+                }
+            }
+        }
 
-        public RecordedHotkey PauseHotkey { get; set; }
+        public RecordedHotkey RecordWindowHotkey
+        {
+            get => _recordWindowHotkey;
+            set
+            {
+                if (Set(ref _recordWindowHotkey, value))
+                {
+                    MainWindow.Instance?.UpdateHotKeys();
+                }
+            }
+        }
 
         public int Fps
         {
@@ -65,6 +99,18 @@ namespace ScreenGIFCapture.ViewModels
         {
             get => _filePath;
             set => Set(ref _filePath, value);
+        }
+
+        public MainViewModel()
+        {
+            var settings = SettingsManager.LoadSettings();
+            Fps = settings.Fps;
+            SelectedCodec = settings.GetCodec();
+            FilePath = settings.FilePath;
+            RegionHotkey = settings.RegionHotkey;
+            PauseHotkey = settings.PauseHotkey;
+            FullScreenHotkey = settings.FullScreenHotkey;
+            RecordWindowHotkey = settings.RecordWindowHotkey;
         }
     }
 }

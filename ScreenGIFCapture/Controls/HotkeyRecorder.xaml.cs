@@ -7,6 +7,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+    using GifCapture.Native;
     using ScreenGIFCapture.Settings;
 
     /// <summary>
@@ -16,13 +17,13 @@
     {
         private readonly TextBox targetTextBox;
 
-        private int[] keys = new int[2]; // [0] — Key, [1] — Modifiers
+        private uint[] keys = new uint[2]; // [0] — Key, [1] — Modifiers
         private List<string> keyNames = new List<string>();
         private bool clearHotkey = false;
         private bool hotkeyHasBeenRecorded = false;
         private readonly List<Key> pressedModifiers = new List<Key>();
 
-        public int[] CapturedKeys => keys;
+        public uint[] CapturedKeys => keys;
 
         public HotkeyRecorder(TextBox target)
         {
@@ -31,23 +32,6 @@
             Loaded += HotkeyRecorder_Loaded;
             targetTextBox.TextChanged += TargetTextBox_TextChanged;
             MuteShortcut.Text = targetTextBox.Text;
-        }
-
-        public static HashSet<Key> ConvertToKeySet(RecordedHotkey hotkey)
-        {
-            var keys = new HashSet<Key>();
-
-            if ((hotkey.Modifiers & (int)HotkeyRecorder.WindowsHotkeys.KeyModifier.Ctrl) != 0)
-                keys.Add(Key.LeftCtrl);
-            if ((hotkey.Modifiers & (int)HotkeyRecorder.WindowsHotkeys.KeyModifier.Shift) != 0)
-                keys.Add(Key.LeftShift);
-            if ((hotkey.Modifiers & (int)HotkeyRecorder.WindowsHotkeys.KeyModifier.Alt) != 0)
-                keys.Add(Key.LeftAlt);
-            if ((hotkey.Modifiers & (int)HotkeyRecorder.WindowsHotkeys.KeyModifier.Win) != 0)
-                keys.Add(Key.LWin);
-
-            keys.Add((Key)hotkey.Key);
-            return keys;
         }
 
         private void HotkeyRecorder_Loaded(object sender, RoutedEventArgs e)
@@ -119,7 +103,7 @@
 
             if (!IsModifierKey(key))
             {
-                keys[0] = (int)key;
+                keys[0] = (uint)KeyInterop.VirtualKeyFromKey(key);
                 keyNames.Add(key.ToString());
                 hotkeyHasBeenRecorded = true;
 
@@ -148,25 +132,25 @@
                 {
                     case Key.LeftCtrl:
                     case Key.RightCtrl:
-                        keys[1] |= (int)WindowsHotkeys.KeyModifier.Ctrl;
+                        keys[1] |= (uint)User32.Modifiers.Control;
                         if (!keyNames.Contains("Ctrl")) keyNames.Add("Ctrl");
                         break;
 
                     case Key.LeftShift:
                     case Key.RightShift:
-                        keys[1] |= (int)WindowsHotkeys.KeyModifier.Shift;
+                        keys[1] |= (uint)User32.Modifiers.Shift;
                         if (!keyNames.Contains("Shift")) keyNames.Add("Shift");
                         break;
 
                     case Key.LeftAlt:
                     case Key.RightAlt:
-                        keys[1] |= (int)WindowsHotkeys.KeyModifier.Alt;
+                        keys[1] |= (uint)User32.Modifiers.Alt;
                         if (!keyNames.Contains("Alt")) keyNames.Add("Alt");
                         break;
 
                     case Key.LWin:
                     case Key.RWin:
-                        keys[1] |= (int)WindowsHotkeys.KeyModifier.Win;
+                        keys[1] |= (uint)User32.Modifiers.Win;
                         if (!keyNames.Contains("Win")) keyNames.Add("Win");
                         break;
                 }
@@ -209,18 +193,5 @@
         }
 
         public event Action<RecordedHotkey> HotkeySaved;
-
-        public static class WindowsHotkeys
-        {
-            [Flags]
-            public enum KeyModifier
-            {
-                None = 0,
-                Alt = 1,
-                Ctrl = 2,
-                Shift = 4,
-                Win = 8
-            }
-        }
     }
 }

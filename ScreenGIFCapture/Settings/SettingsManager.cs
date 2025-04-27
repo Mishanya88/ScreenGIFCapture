@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Input;
 using System.Xml;
+using GifCapture.Native;
 using GifLibrary;
 using Newtonsoft.Json;
 using ScreenGIFCapture.Controls;
@@ -32,7 +33,8 @@ namespace ScreenGIFCapture.Settings
                 FilePath = viewModel.FilePath,
                 RegionHotkey = viewModel.RegionHotkey,
                 FullScreenHotkey = viewModel.FullScreenHotkey,
-                PauseHotkey = viewModel.PauseHotkey
+                PauseHotkey = viewModel.PauseHotkey,
+                RecordWindowHotkey = viewModel.RecordWindowHotkey
             };
 
             File.WriteAllText(SettingsFile, JsonConvert.SerializeObject(settings, SerializerSettings));
@@ -48,30 +50,39 @@ namespace ScreenGIFCapture.Settings
                 var json = File.ReadAllText(SettingsFile);
                 var settings = JsonConvert.DeserializeObject<SettingsModel>(json);
 
-                if (settings.RegionHotkey.Key == 0 && settings.RegionHotkey.Modifiers == 0)
+                if (settings.RegionHotkey == null)
                 { 
                     settings.RegionHotkey = new RecordedHotkey
                     {
-                        Key = (int)System.Windows.Forms.Keys.F2,
-                        Modifiers = (int)WindowsHotkeys.KeyModifier.Alt
+                        Modifiers = (uint)User32.Modifiers.Control,
+                        Key = (uint)KeyInterop.VirtualKeyFromKey(Key.S)
                     };
                 }
 
-                if (settings.FullScreenHotkey.Key == 0 && settings.FullScreenHotkey.Modifiers == 0)
+                if (settings.FullScreenHotkey == null)
                 {
                     settings.FullScreenHotkey = new RecordedHotkey
                     {
-                        Key = (int)System.Windows.Forms.Keys.S,
-                        Modifiers = (int)WindowsHotkeys.KeyModifier.Ctrl
+                        Modifiers = (uint)User32.Modifiers.Control,
+                        Key = (uint)KeyInterop.VirtualKeyFromKey(Key.F)
                     };
                 }
 
-                if (settings.PauseHotkey.Key == 0 && settings.PauseHotkey.Modifiers == 0)
+                if (settings.PauseHotkey == null)
                 {
                     settings.PauseHotkey = new RecordedHotkey
                     {
-                        Key = (int)System.Windows.Forms.Keys.F3,
-                        Modifiers = (int)WindowsHotkeys.KeyModifier.Win
+                        Modifiers = (uint)User32.Modifiers.Alt,
+                        Key = (uint)KeyInterop.VirtualKeyFromKey(Key.S)
+                    };
+                }
+
+                if (settings.RecordWindowHotkey == null)
+                {
+                    settings.RecordWindowHotkey = new RecordedHotkey
+                    {
+                        Modifiers = (uint)User32.Modifiers.Control,
+                        Key = (uint)KeyInterop.VirtualKeyFromKey(Key.W)
                     };
                 }
 
@@ -117,18 +128,23 @@ namespace ScreenGIFCapture.Settings
                 FilePath = GetDefaultSavePath(),
                 RegionHotkey = new RecordedHotkey
                 {
-                    Key = (int)Key.S,
-                    Modifiers = (int)WindowsHotkeys.KeyModifier.Ctrl
+                    Modifiers = (uint)User32.Modifiers.Control,
+                    Key = (uint)KeyInterop.VirtualKeyFromKey(Key.R)
                 },
                 FullScreenHotkey = new RecordedHotkey
                 {
-                    Key = (int)Key.F,
-                    Modifiers = (int)WindowsHotkeys.KeyModifier.Ctrl
+                    Modifiers = (uint)User32.Modifiers.Control,
+                    Key = (uint)KeyInterop.VirtualKeyFromKey(Key.F)
+                },
+                RecordWindowHotkey = new RecordedHotkey
+                {
+                    Modifiers = (uint)User32.Modifiers.Control,
+                    Key = (uint)KeyInterop.VirtualKeyFromKey(Key.W)
                 },
                 PauseHotkey = new RecordedHotkey
                 {
-                    Key = (int)Key.S,
-                    Modifiers = (int)WindowsHotkeys.KeyModifier.Win
+                    Modifiers = (uint)User32.Modifiers.Alt,
+                    Key = (uint)KeyInterop.VirtualKeyFromKey(Key.S)
                 }
             };
         }
