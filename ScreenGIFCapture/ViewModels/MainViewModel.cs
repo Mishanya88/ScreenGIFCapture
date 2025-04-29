@@ -16,6 +16,62 @@
         private RecordedHotkey _fullScreenHotkey;
         private RecordedHotkey _pauseHotkey;
         private RecordedHotkey _recordWindowHotkey;
+        private string _smtpServer = "smtp.gmail.com";
+        private int _smtpPort = 587;
+        private string _subject;
+        private string _senderEmail;
+        private string _senderPassword;
+        private string _bodyEmail;
+        private bool _isEmailEnabled;
+        private bool _rememberLastRecipient;
+
+        public bool RememberLastRecipient
+        {
+            get => _rememberLastRecipient;
+            set => Set(ref _rememberLastRecipient, value);
+        }
+
+        public bool IsEmailEnabled
+        {
+            get => _isEmailEnabled;
+            set => Set(ref _isEmailEnabled, value);
+        }
+
+        public string SmtpServer
+        {
+            get => _smtpServer;
+            set => Set(ref _smtpServer, value);
+        }
+
+        public int SmtpPort
+        {
+            get => _smtpPort;
+            set => Set(ref _smtpPort, value);
+        }
+
+        public string Subject
+        {
+            get => _subject;
+            set => Set(ref _subject, value);
+        }
+
+        public string SenderEmail
+        {
+            get => _senderEmail;
+            set => Set(ref _senderEmail, value);
+        }
+
+        public string SenderPassword
+        {
+            get => _senderPassword;
+            set => Set(ref _senderPassword, value);
+        }
+
+        public string BodyEmail
+        {
+            get => _bodyEmail;
+            set => Set(ref _bodyEmail, value);
+        }
 
         public RecordedHotkey RegionHotkey
         {
@@ -111,6 +167,12 @@
             PauseHotkey = settings.PauseHotkey;
             FullScreenHotkey = settings.FullScreenHotkey;
             RecordWindowHotkey = settings.RecordWindowHotkey;
+            SenderPassword = PasswordProtector.Decrypt(settings.EncryptedPassword);
+            BodyEmail = settings.BodyEmail;
+            Subject = settings.Subject;
+            SenderEmail = settings.SenderEmail;
+            SmtpPort = settings.SmtpPort;
+            SmtpServer = settings.SmtpServer;
         }
     }
 }

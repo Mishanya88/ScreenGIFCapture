@@ -10,7 +10,7 @@
     using Window = System.Windows.Window;
     using ScreenGIFCapture.Settings;
     using ScreenGIFCapture.ViewModels;
-    using System;
+    using System.Windows.Controls;
 
     /// <summary>
     /// Логика взаимодействия для SettingsWindow.xaml
@@ -25,6 +25,7 @@
             FullScreenCaptureHotkeyTextBox.Text = viewModel.FullScreenHotkey.ToString();
             TogglePauseHotkeyTextBox.Text = viewModel.PauseHotkey.ToString();
             WindowCaptureHotkeyTextBox.Text = viewModel.RecordWindowHotkey.ToString();
+            PasswordTextBox.Password = viewModel.SenderPassword;
             this.DataContext = viewModel;
         }
 
@@ -93,6 +94,14 @@
             {
                 MessageBox.Show("Папка не найдена. Возможно, она была удалена.",
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void SenderPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel viewModel)
+            {
+                viewModel.SenderPassword = ((PasswordBox)sender).Password;
             }
         }
     }

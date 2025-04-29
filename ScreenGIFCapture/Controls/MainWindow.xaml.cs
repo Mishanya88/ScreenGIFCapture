@@ -23,6 +23,7 @@
     {
         private RecordBar _recordBar;
         private OverlayWindow _overlayWindow;
+        private EmailWindow _emailWindow;
         private bool _isStop = false;
         private bool _isPaused = false;
         private bool _toExit = false;
@@ -102,6 +103,19 @@
             RegisterHotKeyForAction(hwnd, ViewModel.RecordWindowHotkey, 4);
         }
 
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            var helper = new System.Windows.Interop.WindowInteropHelper(this);
+            User32.UnregisterHotKey(helper.Handle, 1);
+            base.OnClosed(e);
+
+            //if (!_toExit)
+            //{
+            //    e.Cancel = true;
+            //    Hide();
+            //}
+        }
+
         private async void RecordScreenClick(object sender, RoutedEventArgs e)
         {
             if (DataContext is MainViewModel mainViewModel)
@@ -124,8 +138,14 @@
                 _recordBar = new RecordBar(mainViewModel, rectangle);
                 _recordBar.Show();
                 await Task.Run(() => ToRecord(rectangle, 1000 / mainViewModel.Fps, file, mainViewModel));
-            }
 
+                if (mainViewModel.IsEmailEnabled)
+                {
+                    _emailWindow?.Close();
+                    _emailWindow?.Close();
+                    EmailWindow.ShowIfValid(mainViewModel, file);
+                }
+            }
         }
 
         private async void RecordRegionClick(object sender, RoutedEventArgs e)
@@ -159,6 +179,12 @@
                 _recordBar.Show();
                 await Task.Run(() => ToRecord(captureArea.Value, 1000 / mainViewModel.Fps, file, mainViewModel));
 
+                if (mainViewModel.IsEmailEnabled)
+                {
+                    _emailWindow?.Close();
+                    _emailWindow?.Close();
+                    EmailWindow.ShowIfValid(mainViewModel, file);
+                }
             }
         }
 
@@ -189,6 +215,12 @@
                 string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
                 string file = Path.Combine(mainViewModel.FilePath, $"{date}.gif");
                 await Task.Run(() => ToRecord(target.Rectangle, 1000 / mainViewModel.Fps, file, mainViewModel));
+
+                if (mainViewModel.IsEmailEnabled)
+                {
+                    _emailWindow?.Close();
+                    EmailWindow.ShowIfValid(mainViewModel, file);
+                }
             }
         }
 
@@ -291,13 +323,6 @@
             return IntPtr.Zero;
         }
 
-        protected override void OnClosed(EventArgs e)
-        {
-            var helper = new System.Windows.Interop.WindowInteropHelper(this);
-            User32.UnregisterHotKey(helper.Handle, 1);
-            base.OnClosed(e);
-        }
-
         private int GetDelaySeconds(int delayIndex)
         {
             switch (delayIndex)
@@ -346,15 +371,6 @@
             else
             {
                 this.ShowAndFocus();
-            }
-        }
-
-        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
-        {
-            if (!_toExit)
-            {
-                e.Cancel = true;
-                Hide();
             }
         }
 

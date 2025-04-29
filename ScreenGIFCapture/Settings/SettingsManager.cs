@@ -1,30 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Windows.Input;
-using System.Xml;
-using GifCapture.Native;
-using GifLibrary;
-using Newtonsoft.Json;
-using ScreenGIFCapture.Controls;
-using ScreenGIFCapture.ViewModels;
-using static ScreenGIFCapture.Controls.HotkeyRecorder;
-
-namespace ScreenGIFCapture.Settings
+﻿namespace ScreenGIFCapture.Settings
 {
+    using System;
+    using System.IO;
+    using System.Windows.Input;
+    using GifCapture.Native;
+    using GifLibrary;
+    using Newtonsoft.Json;
+    using ScreenGIFCapture.ViewModels;
+
     public static class SettingsManager
     {
-        private static readonly string SettingsFile = "settings.json";
+        private const string SettingsFile = "settings.json";
+
         private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
         {
-            Formatting = Newtonsoft.Json.Formatting.Indented,
+            Formatting = Formatting.Indented,
             NullValueHandling = NullValueHandling.Ignore
         };
+
+        public static void UpdateSetting<T>(string propertyName, T value)
+        {
+            var settings = LoadSettings();
+
+            if (propertyName == nameof(SettingsModel.EncryptedPassword) && value is string password)
+            {
+                value = (T)(object)PasswordProtector.Encrypt(password);
+            }
+
+            var property = typeof(SettingsModel).GetProperty(propertyName);
+            if (property?.CanWrite == true)
+            {
+                property.SetValue(settings, value);
+            }
+
+            SaveToFile(settings);
+        }
 
         public static void SaveSettings(MainViewModel viewModel)
         {
             if (viewModel == null)
                 throw new ArgumentNullException(nameof(viewModel));
+
+            var settingsLoad = LoadSettings();
 
             var settings = new SettingsModel
             {
@@ -34,10 +51,17 @@ namespace ScreenGIFCapture.Settings
                 RegionHotkey = viewModel.RegionHotkey,
                 FullScreenHotkey = viewModel.FullScreenHotkey,
                 PauseHotkey = viewModel.PauseHotkey,
-                RecordWindowHotkey = viewModel.RecordWindowHotkey
+                RecordWindowHotkey = viewModel.RecordWindowHotkey,
+                EncryptedPassword = PasswordProtector.Encrypt(viewModel.SenderPassword),
+                SenderEmail = viewModel.SenderEmail,
+                BodyEmail = viewModel.BodyEmail,
+                Subject = viewModel.Subject,
+                SmtpPort = viewModel.SmtpPort,
+                SmtpServer = viewModel.SmtpServer,
+                ToAddress = settingsLoad.ToAddress
             };
 
-            File.WriteAllText(SettingsFile, JsonConvert.SerializeObject(settings, SerializerSettings));
+            SaveToFile(settings);
         }
 
         public static SettingsModel LoadSettings()
@@ -48,47 +72,22 @@ namespace ScreenGIFCapture.Settings
             try
             {
                 var json = File.ReadAllText(SettingsFile);
-                var settings = JsonConvert.DeserializeObject<SettingsModel>(json);
+                var settings = JsonConvert.DeserializeObject<SettingsModel>(json) ??
+                               CreateDefaultSettings();
 
-                if (settings.RegionHotkey == null)
-                { 
-                    settings.RegionHotkey = new RecordedHotkey
-                    {
-                        Modifiers = (uint)User32.Modifiers.Control,
-                        Key = (uint)KeyInterop.VirtualKeyFromKey(Key.S)
-                    };
-                }
-
-                if (settings.FullScreenHotkey == null)
-                {
-                    settings.FullScreenHotkey = new RecordedHotkey
-                    {
-                        Modifiers = (uint)User32.Modifiers.Control,
-                        Key = (uint)KeyInterop.VirtualKeyFromKey(Key.F)
-                    };
-                }
-
-                if (settings.PauseHotkey == null)
-                {
-                    settings.PauseHotkey = new RecordedHotkey
-                    {
-                        Modifiers = (uint)User32.Modifiers.Alt,
-                        Key = (uint)KeyInterop.VirtualKeyFromKey(Key.S)
-                    };
-                }
-
-                if (settings.RecordWindowHotkey == null)
-                {
-                    settings.RecordWindowHotkey = new RecordedHotkey
-                    {
-                        Modifiers = (uint)User32.Modifiers.Control,
-                        Key = (uint)KeyInterop.VirtualKeyFromKey(Key.W)
-                    };
-                }
+                settings.RegionHotkey ??= CreateHotkey(User32.Modifiers.Control, Key.S);
+                settings.FullScreenHotkey ??= CreateHotkey(User32.Modifiers.Control, Key.F);
+                settings.PauseHotkey ??= CreateHotkey(User32.Modifiers.Alt, Key.S);
+                settings.RecordWindowHotkey ??= CreateHotkey(User32.Modifiers.Control, Key.W);
 
                 if (settings.Fps <= 0)
                 {
                     settings.Fps = 10;
+                }
+
+                if (settings.SmtpPort <= 0)
+                {
+                    settings.SmtpPort = 587;
                 }
 
                 if (!Enum.TryParse(settings.SelectedCodec, out GifQuality _))
@@ -102,51 +101,51 @@ namespace ScreenGIFCapture.Settings
             }
             catch (Exception ex) when (ex is JsonException || ex is IOException)
             {
+                Console.Error.WriteLine($"[SettingsManager] Ошибка чтения настроек: {ex.Message}");
                 return CreateDefaultSettings();
             }
         }
 
         public static string GetDefaultSavePath()
         {
-            string picturesFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-            string savePath = Path.Combine(picturesFolder, "ScreenGIF");
+            var picturesFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            var savePath = Path.Combine(picturesFolder, "ScreenGIF");
 
             if (!Directory.Exists(savePath))
-            {
                 Directory.CreateDirectory(savePath);
-            }
 
             return savePath;
         }
 
-        private static SettingsModel CreateDefaultSettings()
+        private static SettingsModel CreateDefaultSettings() => new SettingsModel
         {
-            return new SettingsModel
-            {
-                Fps = 10,
-                SelectedCodec = GifQuality.Bit8.ToString(),
-                FilePath = GetDefaultSavePath(),
-                RegionHotkey = new RecordedHotkey
-                {
-                    Modifiers = (uint)User32.Modifiers.Control,
-                    Key = (uint)KeyInterop.VirtualKeyFromKey(Key.R)
-                },
-                FullScreenHotkey = new RecordedHotkey
-                {
-                    Modifiers = (uint)User32.Modifiers.Control,
-                    Key = (uint)KeyInterop.VirtualKeyFromKey(Key.F)
-                },
-                RecordWindowHotkey = new RecordedHotkey
-                {
-                    Modifiers = (uint)User32.Modifiers.Control,
-                    Key = (uint)KeyInterop.VirtualKeyFromKey(Key.W)
-                },
-                PauseHotkey = new RecordedHotkey
-                {
-                    Modifiers = (uint)User32.Modifiers.Alt,
-                    Key = (uint)KeyInterop.VirtualKeyFromKey(Key.S)
-                }
-            };
+            Fps = 10,
+            SelectedCodec = GifQuality.Bit8.ToString(),
+            FilePath = GetDefaultSavePath(),
+            RegionHotkey = CreateHotkey(User32.Modifiers.Control, Key.R),
+            FullScreenHotkey = CreateHotkey(User32.Modifiers.Control, Key.F),
+            RecordWindowHotkey = CreateHotkey(User32.Modifiers.Control, Key.W),
+            PauseHotkey = CreateHotkey(User32.Modifiers.Alt, Key.S),
+            EncryptedPassword = string.Empty,
+            BodyEmail = "Gif прилагается.",
+            Subject = "Отправка электронной почты с GifRecord",
+            SmtpServer = "smtp.gmail.com",
+            SenderEmail = string.Empty,
+            SmtpPort = 587,
+            ToAddress = string.Empty
+        };
+
+        private static RecordedHotkey CreateHotkey(User32.Modifiers modifier,
+            Key key) => new RecordedHotkey
+        {
+            Modifiers = (uint)modifier,
+            Key = (uint)KeyInterop.VirtualKeyFromKey(key)
+        };
+
+        private static void SaveToFile(SettingsModel settings)
+        {
+            File.WriteAllText(SettingsFile, JsonConvert.SerializeObject(settings,
+                SerializerSettings));
         }
     }
 }

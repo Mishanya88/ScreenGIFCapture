@@ -115,7 +115,70 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
+            <TabItem Header="Email">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
+                    <CheckBox Content="Включить отправку Email"
+                  IsChecked="{Binding IsEmailEnabled, Mode=TwoWay}"
+                  Margin="0,0,0,10"/>
+
+                    <Grid Grid.Row="1" IsEnabled="{Binding IsEmailEnabled}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="SMTP сервер:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Margin="0,0,10,5"/>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
+                            <TextBox Width="200" Margin="0,0,10,0"
+                         Text="{Binding SmtpServer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="Порт:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <xctk:IntegerUpDown Minimum="1" Maximum="65535" Width="80" FormatString="F0"
+                                    HorizontalContentAlignment="Center"
+                                    Value="{Binding SmtpPort, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Email отправителя:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" Margin="0,0,10,5"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,5"
+                     Text="{Binding SenderEmail, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Text="Пароль:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" Margin="0,0,10,5"/>
+                        <PasswordBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,5"
+                         PasswordChanged="SenderPasswordBox_PasswordChanged"
+                         Name="PasswordTextBox"/>
+
+                        <CheckBox Content="Помнить адрес последнего получателя"
+                      Grid.Row="4" Grid.Column="1" Margin="0,5,0,5"
+                      IsChecked="{Binding RememberLastRecipient, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Text="Тема по умолчанию:" VerticalAlignment="Center" Grid.Row="5" Grid.Column="0" Margin="0,0,10,5"/>
+                        <TextBox Grid.Row="5" Grid.Column="1" Margin="0,0,0,5"
+                     Text="{Binding Subject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2">
+                            <TextBlock Text="Сообщение по умолчанию:" VerticalAlignment="Top" Margin="0,0,0,5"/>
+                            <TextBox AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto"
+                         TextWrapping="Wrap"
+                         Height="120"
+                         Text="{Binding BodyEmail, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>
