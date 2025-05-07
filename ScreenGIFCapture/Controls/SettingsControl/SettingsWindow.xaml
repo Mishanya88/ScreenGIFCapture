@@ -24,7 +24,7 @@
 
                     <TextBlock Text="Frame Rate (FPS):" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Margin="0,0,10,5"/>
                     <xctk:IntegerUpDown Name="FrameRateUpDown"
-                                        Minimum="1" Maximum="60"
+                                        Minimum="1" Maximum="240"
                                         Width="80"
                                         FormatString="F0"
                                         HorizontalContentAlignment="Center"

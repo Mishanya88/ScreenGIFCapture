@@ -265,7 +265,7 @@
                             prev = curr;
 
                             Bitmap img = provider.Capture();
-                            gifCreator.AddFrame(img, currentDelay, quality: mainViewModel.SelectedCodec);
+                            gifCreator.AddFrame(img, Math.Max(10, currentDelay), quality: mainViewModel.SelectedCodec);
                             img.Dispose();
                             Dispatcher.Invoke(() => { mainViewModel.ElapsedSeconds =
                                 (int)sw.Elapsed.TotalSeconds; });
