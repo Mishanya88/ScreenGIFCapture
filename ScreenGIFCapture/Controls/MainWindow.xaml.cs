@@ -109,11 +109,11 @@
             User32.UnregisterHotKey(helper.Handle, 1);
             base.OnClosed(e);
 
-            //if (!_toExit)
-            //{
-            //    e.Cancel = true;
-            //    Hide();
-            //}
+            if (!_toExit)
+            {
+                e.Cancel = true;
+                Hide();
+            }
         }
 
         private async void RecordScreenClick(object sender, RoutedEventArgs e)
@@ -131,7 +131,6 @@
 
                 IScreen screen = ScreenWindow.GetScreen();
                 Rectangle rectangle = screen.Rectangle;
-                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                 string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
                 string file = Path.Combine(mainViewModel.FilePath, $"{date}.gif");
                 _recordBar?.Close();
@@ -171,7 +170,6 @@
                 }
 
                 mainViewModel.Recoding = true;
-                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                 string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
                 string file = Path.Combine(mainViewModel.FilePath, $"{date}.gif");
                 _recordBar?.Close();
@@ -211,7 +209,6 @@
                 _recordBar.Show();
 
                 mainViewModel.Recoding = true;
-                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                 string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
                 string file = Path.Combine(mainViewModel.FilePath, $"{date}.gif");
                 await Task.Run(() => ToRecord(target.Rectangle, 1000 / mainViewModel.Fps, file, mainViewModel));

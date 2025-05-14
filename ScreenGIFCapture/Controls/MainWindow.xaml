@@ -11,7 +11,9 @@
         SizeToContent="WidthAndHeight"
         UseLayoutRounding="True"
         Title="GifCapture"
-        ResizeMode="CanMinimize">
+        ResizeMode="CanMinimize"
+        Icon="/Icons/logo.ico">
+
     <Window.Resources>
         <converters:NegatingConverter x:Key="NegatingConverter" />
         <converters:VisibilityConverter x:Key="VisibilityConverter" />
@@ -176,6 +178,17 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
+                <Button Style="{StaticResource ButtonStyle1}"
+                    Click="OpenSettingsWindow"
+                    x:Name="SettingsButton">
+                    <Button.Content>
+                        <StackPanel>
+                            <Image Source="/Icons/settings.png" Width="35" />
+                            <TextBlock Text="Settings" Margin="0 6 0 0"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+
             </StackPanel>
         </Border>
         <Border BorderThickness="0 1 0 0" BorderBrush="#B9B9B9" SnapsToDevicePixels="True"
@@ -193,8 +206,7 @@
                     <ComboBoxItem>6 s</ComboBoxItem>
                     <ComboBoxItem>8 s</ComboBoxItem>
                 </ComboBox>
-                <Button Content="Settings" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="30" Click="OpenSettingsWindow"/>
-                </StackPanel>
+            </StackPanel>
             </Border>
         <Border SnapsToDevicePixels = "True" 
                 BorderThickness="0 1 0 0"
@@ -233,7 +245,8 @@
                         Grid.Row="3"
                         ToolTipText="GifCapture"
                         MenuActivation="RightClick"
-                        TrayMouseDoubleClick ="TaskbarIcon_OnTrayMouseDoubleClick">
+                        TrayMouseDoubleClick ="TaskbarIcon_OnTrayMouseDoubleClick"
+                        IconSource="/Icons/logo.ico">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu Style="{StaticResource ContextMenuStyle}">
                     <ContextMenu.Resources>

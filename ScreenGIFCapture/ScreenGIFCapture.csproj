@@ -12,7 +12,9 @@
 	<ItemGroup>
 	  <None Remove="Controls\stop.png" />
 	  <None Remove="Icons\full.png" />
+	  <None Remove="Icons\logo.ico" />
 	  <None Remove="Icons\region.png" />
+	  <None Remove="Icons\settings.png" />
 	  <None Remove="Icons\window.png" />
 	</ItemGroup>
 
@@ -37,7 +39,9 @@
 
   <ItemGroup>
     <Resource Include="Icons\full.png" />
+    <Resource Include="Icons\logo.ico" />
     <Resource Include="Icons\region.png" />
+    <Resource Include="Icons\settings.png" />
     <Resource Include="Icons\stop.png" />
     <Resource Include="Icons\window.png" />
   </ItemGroup>
