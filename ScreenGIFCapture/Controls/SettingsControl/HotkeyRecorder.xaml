@@ -7,10 +7,10 @@
         Topmost="True"
         ShowInTaskbar="False"
         Visibility="Visible"
-
+        AllowsTransparency="True"
         Background="#B2000000"
         Title="HotkeyRecorder"
-
+        WindowStyle="None"
         WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
