@@ -9,7 +9,7 @@
         private bool _recoding = false;
         private int _elapsedSeconds;
         private int _delayIndex;
-        private int _fps = 10;
+        private int _fps = 60;
         private string _filePath = SettingsManager.GetDefaultSavePath();
         private GifQuality _selectedCodec = GifQuality.Bit8;
         private RecordedHotkey _regionHotkey;
