@@ -15,6 +15,7 @@
     using GifCapture.Native;
     using ScreenGIFCapture.Utils;
     using ScreenGIFCapture.Settings;
+    using System.Windows.Interop;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -24,6 +25,7 @@
         private RecordBar _recordBar;
         private OverlayWindow _overlayWindow;
         private EmailWindow _emailWindow;
+        private HotkeyManager _hotkeyManager;
         private bool _isStop = false;
         private bool _isPaused = false;
         private bool _toExit = false;
@@ -39,9 +41,9 @@
             Instance = this;
             DataContext = ViewModel;
 
-            this.Loaded += (sender, args) =>
+            Loaded += (sender, args) =>
             {
-                var helper = new System.Windows.Interop.WindowInteropHelper(this);
+                var helper = new WindowInteropHelper(this);
                 var hwnd = helper.Handle;
 
                 if (hwnd == IntPtr.Zero)
@@ -50,13 +52,26 @@
                     return;
                 }
 
-                var source = System.Windows.Interop.HwndSource.FromHwnd(hwnd);
-                source.AddHook(HwndHook);
-
-                UpdateHotKeys(hwnd);
+                _hotkeyManager = new HotkeyManager(hwnd, ViewModel);
+                _hotkeyManager.RegionHotkeyPressed += ToggleRegionRecording;
+                _hotkeyManager.FullScreenHotkeyPressed += ToggleFullScreenRecording;
+                _hotkeyManager.WindowHotkeyPressed += ToggleWindowRecording;
+                _hotkeyManager.PauseHotkeyPressed += () =>
+                {
+                    if (ViewModel.Recoding)
+                    {
+                        if (_isPaused)
+                        {
+                            ResumeRecording();
+                        }
+                        else
+                        {
+                            PauseRecording();
+                        }
+                    }
+                };
             };
         }
-
         public void PauseRecording() => _isPaused = true;
 
         public void ResumeRecording() => _isPaused = false;
@@ -75,45 +90,24 @@
             _isStop = true;
         }
 
-        public void UpdateHotKeys(IntPtr hwnd)
-        {
-            User32.UnregisterHotKey(hwnd, 1);
-            User32.UnregisterHotKey(hwnd, 2);
-            User32.UnregisterHotKey(hwnd, 3);
-            User32.UnregisterHotKey(hwnd, 4);
-
-            RegisterHotKeyForAction(hwnd, ViewModel.RegionHotkey, 1);
-            RegisterHotKeyForAction(hwnd, ViewModel.FullScreenHotkey, 2);
-            RegisterHotKeyForAction(hwnd, ViewModel.PauseHotkey, 3);
-            RegisterHotKeyForAction(hwnd, ViewModel.RecordWindowHotkey, 4);
-        }
-
         public void UpdateHotKeys()
         {
-            var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-
-            User32.UnregisterHotKey(hwnd, 1);
-            User32.UnregisterHotKey(hwnd, 2);
-            User32.UnregisterHotKey(hwnd, 3);
-            User32.UnregisterHotKey(hwnd, 4);
-
-            RegisterHotKeyForAction(hwnd, ViewModel.RegionHotkey, 1);
-            RegisterHotKeyForAction(hwnd, ViewModel.FullScreenHotkey, 2);
-            RegisterHotKeyForAction(hwnd, ViewModel.PauseHotkey, 3);
-            RegisterHotKeyForAction(hwnd, ViewModel.RecordWindowHotkey, 4);
+            _hotkeyManager?.UpdateHotkeys();
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            var helper = new System.Windows.Interop.WindowInteropHelper(this);
-            User32.UnregisterHotKey(helper.Handle, 1);
+            _hotkeyManager?.Dispose();
             base.OnClosed(e);
+
+            #if RELEASE
 
             if (!_toExit)
             {
                 e.Cancel = true;
                 Hide();
             }
+            #endif
         }
 
         private async void RecordScreenClick(object sender, RoutedEventArgs e)
@@ -276,50 +270,6 @@
             _isStop = false;
         }
 
-        private void RegisterHotKeyForAction(IntPtr hwnd, RecordedHotkey hotkey, int id)
-        {
-            if (hotkey != null)
-            {
-                User32.RegisterHotKey(hwnd, id, hotkey.Modifiers, hotkey.Key);
-            }
-        }
-
-        private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            const int WM_HOTKEY = 0x0312;
-            if (msg == WM_HOTKEY)
-            {
-                int id = wParam.ToInt32();
-                switch (id)
-                {
-                    case 1:
-                        RecordRegionClick(this, null);
-                        break;
-                    case 2:
-                        RecordScreenClick(this, null);
-                        break;
-                    case 3:
-                        if (ViewModel.Recoding)
-                        {
-                            if (_isPaused)
-                            {
-                                ResumeRecording();
-                            }
-                            else
-                            {
-                                PauseRecording();
-                            }
-                        }
-                        break;
-                    case 4:
-                        RecordWindowClick(this, null);
-                        break;
-                }
-                handled = true;
-            }
-            return IntPtr.Zero;
-        }
-
         private int GetDelaySeconds(int delayIndex)
         {
             switch (delayIndex)
@@ -354,7 +304,7 @@
 
         private void OpenSettingsWindow(object sender, RoutedEventArgs e)
         {
-            SettingsWindow settingsWindow = new SettingsWindow(ViewModel);
+            SettingsWindow settingsWindow = new SettingsWindow(ViewModel, _hotkeyManager);
             settingsWindow.Owner = this;
             settingsWindow.ShowDialog();
         }
@@ -375,6 +325,42 @@
         {
             _toExit = true;
             Close();
+        }
+
+        private void ToggleRegionRecording()
+        {
+            if (ViewModel.Recoding)
+            {
+                StopScreenClick(this, null);
+            }
+            else
+            {
+                RecordRegionClick(this, null);
+            }
+        }
+
+        private void ToggleFullScreenRecording()
+        {
+            if (ViewModel.Recoding)
+            {
+                StopScreenClick(this, null);
+            }
+            else
+            {
+                RecordScreenClick(this, null);
+            }
+        }
+
+        private void ToggleWindowRecording()
+        {
+            if (ViewModel.Recoding)
+            {
+                StopScreenClick(this, null);
+            }
+            else
+            {
+                RecordWindowClick(this, null);
+            }
         }
     }
 }

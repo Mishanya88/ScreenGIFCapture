@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
         UseLayoutRounding="True"
-        Title="GifCapture"
+        Title="GifRecord"
         ResizeMode="CanMinimize"
         Icon="/Icons/logo.ico">
 

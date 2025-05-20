@@ -7,11 +7,12 @@
         Width="600" Height="400"
         WindowStartupLocation="CenterOwner"
         WindowStyle="SingleBorderWindow"
-        Closing="SettingsWindow_OnClosing">
+        Closing="SettingsWindow_OnClosing"
+        Icon="/Icons/settings.png">
 
     <Grid>
         <TabControl>
-            <TabItem Header="Recording">
+            <TabItem Header="Запись">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -45,7 +46,7 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Hotkeys">
+            <TabItem Header="Горячие клавиши">
                 <TabItem.Content>
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="20,0,0,10">
@@ -79,7 +80,7 @@
                 </TabItem.Content>
             </TabItem>
 
-            <TabItem Header="Save Location">
+            <TabItem Header="Место сохранения">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>

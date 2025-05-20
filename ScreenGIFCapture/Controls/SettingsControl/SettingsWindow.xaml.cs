@@ -17,7 +17,9 @@
     /// </summary>
     public partial class SettingsWindow : Window
     {
-        public SettingsWindow(MainViewModel viewModel)
+        private HotkeyManager _hotkeyManager;
+
+        public SettingsWindow(MainViewModel viewModel, HotkeyManager hotkeyManager)
         {
             InitializeComponent();
 
@@ -27,14 +29,18 @@
             WindowCaptureHotkeyTextBox.Text = viewModel.RecordWindowHotkey.ToString();
             PasswordTextBox.Password = viewModel.SenderPassword;
             this.DataContext = viewModel;
+            _hotkeyManager = hotkeyManager;
         }
 
         private void HotkeyTextBox_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is TextBox textBox)
             {
-                var recorder = new HotkeyRecorder(textBox);
-                recorder.Owner = this;
+                _hotkeyManager.Pause();
+                var recorder = new HotkeyRecorder(textBox)
+                {
+                    Owner = this
+                };
 
                 recorder.HotkeySaved += hotkey =>
                 {
@@ -56,6 +62,11 @@
                     {
                         MainWindow.Instance.ViewModel.RecordWindowHotkey = hotkey;
                     }
+                };
+
+                recorder.Closed += (_, __) =>
+                {
+                    _hotkeyManager.Resume();
                 };
 
                 recorder.ShowDialog();
