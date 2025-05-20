@@ -1,4 +1,6 @@
-﻿namespace ScreenGIFCapture.Controls
+﻿using ScreenGIFCapture.Service;
+
+namespace ScreenGIFCapture.Controls
 {
     using System;
     using System.IO;
@@ -16,6 +18,7 @@
     using ScreenGIFCapture.Utils;
     using ScreenGIFCapture.Settings;
     using System.Windows.Interop;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -125,19 +128,7 @@
 
                 IScreen screen = ScreenWindow.GetScreen();
                 Rectangle rectangle = screen.Rectangle;
-                string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
-                string file = Path.Combine(mainViewModel.FilePath, $"{date}.gif");
-                _recordBar?.Close();
-                _recordBar = new RecordBar(mainViewModel, rectangle);
-                _recordBar.Show();
-                await Task.Run(() => ToRecord(rectangle, 1000 / mainViewModel.Fps, file, mainViewModel));
-
-                if (mainViewModel.IsEmailEnabled)
-                {
-                    _emailWindow?.Close();
-                    _emailWindow?.Close();
-                    EmailWindow.ShowIfValid(mainViewModel, file);
-                }
+                await StartRecording(rectangle, mainViewModel);
             }
         }
 
@@ -164,19 +155,7 @@
                 }
 
                 mainViewModel.Recoding = true;
-                string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
-                string file = Path.Combine(mainViewModel.FilePath, $"{date}.gif");
-                _recordBar?.Close();
-                _recordBar = new RecordBar(mainViewModel, captureArea.Value);
-                _recordBar.Show();
-                await Task.Run(() => ToRecord(captureArea.Value, 1000 / mainViewModel.Fps, file, mainViewModel));
-
-                if (mainViewModel.IsEmailEnabled)
-                {
-                    _emailWindow?.Close();
-                    _emailWindow?.Close();
-                    EmailWindow.ShowIfValid(mainViewModel, file);
-                }
+                await StartRecording(captureArea.Value, mainViewModel); ;
             }
         }
 
@@ -203,15 +182,25 @@
                 _recordBar.Show();
 
                 mainViewModel.Recoding = true;
-                string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
-                string file = Path.Combine(mainViewModel.FilePath, $"{date}.gif");
-                await Task.Run(() => ToRecord(target.Rectangle, 1000 / mainViewModel.Fps, file, mainViewModel));
+                await StartRecording(target.Rectangle, mainViewModel);
+            }
+        }
 
-                if (mainViewModel.IsEmailEnabled)
-                {
-                    _emailWindow?.Close();
-                    EmailWindow.ShowIfValid(mainViewModel, file);
-                }
+        private async Task StartRecording(Rectangle area, MainViewModel viewModel)
+        {
+            string date = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+            string file = Path.Combine(viewModel.FilePath, $"{date}.gif");
+
+            _recordBar?.Close();
+            _recordBar = new RecordBar(viewModel, area);
+            _recordBar.Show();
+
+            await Task.Run(() => ToRecord(area, 1000 / viewModel.Fps, file, viewModel));
+
+            if (viewModel.IsEmailEnabled)
+            {
+                _emailWindow?.Close();
+                EmailWindow.ShowIfValid(viewModel, file);
             }
         }
 
@@ -264,6 +253,11 @@
                     }
                 }
                 sw.Stop();
+                Dictionary<string, string> args = new Dictionary<string, string>();
+                args.Add("imagePath", gifPath);
+                NotificationsService.Notice("Запись с экрана была сохранена",
+                    $"Местоположение：{gifPath}", gifPath, args);
+
             });
 
             Task.WaitAll(task1);
