@@ -177,10 +177,6 @@ namespace ScreenGIFCapture.Controls
                     countdownWindow.ShowDialog();
                 }
 
-                _recordBar?.Close();
-                _recordBar = new RecordBar(mainViewModel, target.Rectangle);
-                _recordBar.Show();
-
                 mainViewModel.Recoding = true;
                 await StartRecording(target.Rectangle, mainViewModel);
             }
